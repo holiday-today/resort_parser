@@ -1,0 +1,332 @@
+{
+    "Constance Ephelia Resort": {
+        " Junior Suite ": {
+            "RoomBed": "double",
+            "Types": [
+                {
+                    "Sleeps": "2+1",
+                    "Price": {
+                        "Bed Breakfast": 113210
+                    }
+                },
+                {
+                    "Sleeps": "2+1",
+                    "Price": {
+                        "Half Board": 134605
+                    }
+                },
+                {
+                    "Sleeps": "2+1",
+                    "Price": {
+                        "Bed Breakfast": 136059
+                    }
+                },
+                {
+                    "Sleeps": "2+1",
+                    "Price": {
+                        "Half Board": 162332
+                    }
+                },
+                {
+                    "Sleeps": "2",
+                    "Price": {
+                        "Bed Breakfast": 114477
+                    }
+                },
+                {
+                    "Sleeps": "2",
+                    "Price": {
+                        "Half Board": 140751
+                    }
+                },
+                {
+                    "Sleeps": "1",
+                    "Price": {
+                        "Bed Breakfast": 104155
+                    }
+                },
+                {
+                    "Sleeps": "1+1",
+                    "Price": {
+                        "Bed Breakfast": 104296
+                    }
+                },
+                {
+                    "Sleeps": "1+1",
+                    "Price": {
+                        "Half Board": 114993
+                    }
+                },
+                {
+                    "Sleeps": "1",
+                    "Price": {
+                        "Half Board": 117292
+                    }
+                },
+                {
+                    "Sleeps": "1+1",
+                    "Price": {
+                        "Bed Breakfast": 125737
+                    }
+                },
+                {
+                    "Sleeps": "1+1",
+                    "Price": {
+                        "Half Board": 138874
+                    }
+                }
+            ]
+        },
+        " Senior Suite ": {
+            "RoomBed": "double",
+            "Types": [
+                {
+                    "Sleeps": "2+1",
+                    "Price": {
+                        "Bed Breakfast": 131930
+                    }
+                },
+                {
+                    "Sleeps": "2+1",
+                    "Price": {
+                        "Half Board": 153324
+                    }
+                },
+                {
+                    "Sleeps": "2+1",
+                    "Price": {
+                        "Bed Breakfast": 159517
+                    }
+                },
+                {
+                    "Sleeps": "2+1",
+                    "Price": {
+                        "Half Board": 185791
+                    }
+                },
+                {
+                    "Sleeps": "3",
+                    "Price": {
+                        "Bed Breakfast": 155764
+                    }
+                },
+                {
+                    "Sleeps": "3",
+                    "Price": {
+                        "Half Board": 195174
+                    }
+                },
+                {
+                    "Sleeps": "2",
+                    "Price": {
+                        "Bed Breakfast": 137936
+                    }
+                },
+                {
+                    "Sleeps": "2",
+                    "Price": {
+                        "Half Board": 164209
+                    }
+                },
+                {
+                    "Sleeps": "1+1",
+                    "Price": {
+                        "Bed Breakfast": 123907
+                    }
+                },
+                {
+                    "Sleeps": "1",
+                    "Price": {
+                        "Bed Breakfast": 127614
+                    }
+                },
+                {
+                    "Sleeps": "1+1",
+                    "Price": {
+                        "Half Board": 134605
+                    }
+                },
+                {
+                    "Sleeps": "1",
+                    "Price": {
+                        "Half Board": 140751
+                    }
+                },
+                {
+                    "Sleeps": "1+1",
+                    "Price": {
+                        "Bed Breakfast": 149196
+                    }
+                },
+                {
+                    "Sleeps": "1+1",
+                    "Price": {
+                        "Half Board": 162332
+                    }
+                }
+            ]
+        },
+        " Three-Bedroom Family Villa with Private Pool ": {
+            "RoomBed": "double",
+            "Types": [
+                {
+                    "Sleeps": "2+1",
+                    "Price": {
+                        "Half Board": 320911
+                    }
+                },
+                {
+                    "Sleeps": "2+1",
+                    "Price": {
+                        "Half Board": 373458
+                    }
+                },
+                {
+                    "Sleeps": "6",
+                    "Price": {
+                        "Half Board": 299330
+                    }
+                },
+                {
+                    "Sleeps": "6",
+                    "Price": {
+                        "Half Board": 351877
+                    }
+                }
+            ]
+        },
+        " Two-Bedroom Beach Villa with Private Pool ": {
+            "RoomBed": "double",
+            "Types": [
+                {
+                    "Sleeps": "2+1",
+                    "Price": {
+                        "Half Board": 340617
+                    }
+                },
+                {
+                    "Sleeps": "2+1",
+                    "Price": {
+                        "Half Board": 396917
+                    }
+                },
+                {
+                    "Sleeps": "4",
+                    "Price": {
+                        "Half Board": 319035
+                    }
+                },
+                {
+                    "Sleeps": "4",
+                    "Price": {
+                        "Half Board": 375335
+                    }
+                }
+            ]
+        },
+        " Two-Bedroom Hillside Villa with Private Pool -  Adults Only ": {
+            "RoomBed": "double",
+            "Types": [
+                {
+                    "Sleeps": "4",
+                    "Price": {
+                        "Half Board": 428820
+                    }
+                },
+                {
+                    "Sleeps": "4",
+                    "Price": {
+                        "Half Board": 504826
+                    }
+                }
+            ]
+        },
+        " Tropical Garden View Room (2 Adults Only) ": {
+            "RoomBed": "double",
+            "Types": [
+                {
+                    "Sleeps": "2",
+                    "Price": {
+                        "Bed Breakfast": 83512
+                    }
+                },
+                {
+                    "Sleeps": "2",
+                    "Price": {
+                        "Bed Breakfast": 98525
+                    }
+                },
+                {
+                    "Sleeps": "2",
+                    "Price": {
+                        "Half Board": 106032
+                    }
+                },
+                {
+                    "Sleeps": "2",
+                    "Price": {
+                        "Half Board": 124799
+                    }
+                },
+                {
+                    "Sleeps": "1",
+                    "Price": {
+                        "Bed Breakfast": 75067
+                    }
+                },
+                {
+                    "Sleeps": "1",
+                    "Price": {
+                        "Half Board": 85389
+                    }
+                },
+                {
+                    "Sleeps": "1",
+                    "Price": {
+                        "Bed Breakfast": 88204
+                    }
+                },
+                {
+                    "Sleeps": "1",
+                    "Price": {
+                        "Half Board": 101340
+                    }
+                }
+            ]
+        },
+        " One-Bedroom Beach Villa with Private Pool ": {
+            "RoomBed": "double",
+            "Types": [
+                {
+                    "Sleeps": "2",
+                    "Price": {
+                        "Half Board": 219571
+                    }
+                },
+                {
+                    "Sleeps": "2",
+                    "Price": {
+                        "Half Board": 258043
+                    }
+                }
+            ]
+        },
+        " One-Bedroom Hillside Villa with Private Pool- Adults Only ": {
+            "RoomBed": "double",
+            "Types": [
+                {
+                    "Sleeps": "2",
+                    "Price": {
+                        "Half Board": 319035
+                    }
+                },
+                {
+                    "Sleeps": "2",
+                    "Price": {
+                        "Half Board": 375335
+                    }
+                }
+            ]
+        }
+    }
+}
