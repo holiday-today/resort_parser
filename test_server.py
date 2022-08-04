@@ -32,4 +32,4 @@ api.add_resource(Main, "/get/allresult")
 api.init_app(app)
 
 if __name__ == "__main__":
-    app.run(debug=True, port=3000, host="127.0.0.1")
+    app.run(debug=True)
