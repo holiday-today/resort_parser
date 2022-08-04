@@ -157,4 +157,21 @@ def main():
 
 
 if __name__ == '__main__':
+    r = requests.post("https://dashboard.heroku.com/apps/holiday-today/get/allresult")
+    r = r.json()
+    url_keys = {
+        'STATEINC': r['STATEINC'],           
+        'CHECKIN_BEG': r['CHECKIN_BEG'],  
+        'CHECKIN_END': r['CHECKIN_BEG'],  
+        'NIGHTS_FROM': r['NIGHTS_FROM'],         
+        'NIGHTS_TILL': r['NIGHTS_FROM'],         
+        'ADULT': r['ADULT'],               
+        'CHILD': r['CHILD'],               
+        'AGES': r['AGES'],
+        'CURRENCY': '1',            
+        'TOWNS': r['TOWNS'],
+        'FILTER': '1',              
+        'PRICEPAGE': 1,             
+        'DOLOAD': 1                 
+    }
     main()
