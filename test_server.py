@@ -24,7 +24,25 @@ class Main(Resource):
 
     def post(self):
         f = parser.parse_args()
-        return main.start(f)
+        post_json = {
+            'STATEINC': f['STATEINC'],           
+            'CHECKIN_BEG': f['CHECKIN_BEG'],  
+            'CHECKIN_END': f['CHECKIN_BEG'],  
+            'NIGHTS_FROM': f['NIGHTS_FROM'],         
+            'NIGHTS_TILL': f['NIGHTS_FROM'],         
+            'ADULT': f['ADULT'],               
+            'CHILD': f['CHILD'],               
+            'AGES': f['AGES'],
+            'CURRENCY': '1',            
+            'TOWNS': f['TOWNS'],
+            'HOTELS': f['HOTELS'],
+            'MEALS': f['MEALS'],
+            'STARS': f['STARS'],
+            'FILTER': '1',              
+            'PRICEPAGE': 1,             
+            'DOLOAD': 1                 
+        }
+        return main.start(post_json)
 
 
 api.add_resource(Main, "/get/allresult")
