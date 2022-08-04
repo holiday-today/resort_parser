@@ -24,7 +24,6 @@ class Main(Resource):
 
     def post(self):
         f = parser.parse_args()
-        print(f['HOTELS'])
         return main.start(f)
 
 
@@ -32,4 +31,5 @@ api.add_resource(Main, "/get/allresult")
 api.init_app(app)
 
 if __name__ == "__main__":
+    print('Server started!')
     app.run(debug=True)
