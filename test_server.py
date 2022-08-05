@@ -1,21 +1,38 @@
-from flask import Flask
-from flask_restful import Api, Resource, reqparse
+from flask import Flask, jsonify, request
+from flask_restful import Api, Resource
 import main
+import json
 
 app = Flask(__name__)
 api = Api()
 
-parser = reqparse.RequestParser()
-parser.add_argument('STATEINC', type=str, location='form')
-parser.add_argument('CHECKIN_BEG', type=str, location='form')
-parser.add_argument('NIGHTS_FROM', type=str, location='form')
-parser.add_argument('ADULT', type=str, location='form')
-parser.add_argument('CHILD', type=str, location='form')
-parser.add_argument('AGES', action='append', location='form')
-parser.add_argument('TOWNS', action='append', location='form')
-parser.add_argument('HOTELS', action='append', location='form')
-parser.add_argument('MEALS', action='append', location='form')
-parser.add_argument('STARS', action='append', location='form')
+def to_json(data):
+    data = str(data).split("'")[1].split('&')
+    post_json = {
+        'STATEINC': None,           
+        'CHECKIN_BEG': None,  
+        'CHECKIN_END': None,  
+        'NIGHTS_FROM': None,         
+        'NIGHTS_TILL': None,         
+        'ADULT': None,               
+        'CHILD': None,               
+        'AGES': [],
+        'CURRENCY': '1',            
+        'TOWNS': [],
+        'HOTELS': [],
+        'MEALS': [],
+        'STARS': [],
+        'FILTER': '1',              
+        'PRICEPAGE': 1,             
+        'DOLOAD': 1                 
+    }
+    for el in data:
+        k, v = el.split('=')[0], el.split('=')[1]
+        if post_json[k] is None:
+            post_json[k] = v
+        else:
+            post_json[k].append(v)
+    return post_json
 
 
 class Main(Resource):
@@ -23,31 +40,15 @@ class Main(Resource):
         return main.main()
 
     def post(self):
-        f = parser.parse_args()
-        post_json = {
-            'STATEINC': f['STATEINC'],           
-            'CHECKIN_BEG': f['CHECKIN_BEG'],  
-            'CHECKIN_END': f['CHECKIN_BEG'],  
-            'NIGHTS_FROM': f['NIGHTS_FROM'],         
-            'NIGHTS_TILL': f['NIGHTS_FROM'],         
-            'ADULT': f['ADULT'],               
-            'CHILD': f['CHILD'],               
-            'AGES': f['AGES'],
-            'CURRENCY': '1',            
-            'TOWNS': f['TOWNS'],
-            'HOTELS': f['HOTELS'],
-            'MEALS': f['MEALS'],
-            'STARS': f['STARS'],
-            'FILTER': '1',              
-            'PRICEPAGE': 1,             
-            'DOLOAD': 1                 
-        }
-        return main.start(post_json)
+        if (request.headers.get('Content-Type') == 'application/json'):
+            myjson = request.data
+            return main.start(to_json(myjson))
+        else:
+            return 'Content-Type not supported!'
 
 
 api.add_resource(Main, "/get/allresult")
 api.init_app(app)
 
 if __name__ == "__main__":
-    print('Server started!')
     app.run(debug=True)
