@@ -39,4 +39,6 @@ def test():
         f = request.json
     except Exception as e1:
         return 'Bad response json :('
+    print('we have json!')
+    print(f)
     return main.start(to_main_json(f))
