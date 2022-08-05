@@ -36,6 +36,3 @@ def to_json(data):
 def test():
     f = to_json(request.form)
     return f
-
-if __name__ == "__main__":
-    app.run(debug=True)
