@@ -5,34 +5,13 @@ logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 
-def to_json(data):
-    post_json = {
-        'STATEINC': None,           
-        'CHECKIN_BEG': None,  
-        'CHECKIN_END': None,  
-        'NIGHTS_FROM': None,         
-        'NIGHTS_TILL': None,         
-        'ADULT': None,               
-        'CHILD': None,               
-        'AGES': [],
-        'CURRENCY': '1',            
-        'TOWNS': [],
-        'HOTELS': [],
-        'MEALS': [],
-        'STARS': [],
-        'FILTER': '1',              
-        'PRICEPAGE': 1,             
-        'DOLOAD': 1                 
-    }
-    for el in data:
-        if post_json[el] is None:
-            post_json[el] = data[el]
-        else:
-            post_json[el].append(data[el])
-    return post_json
-
-
 @app.route("/", methods=["POST"])
 def test():
-    f = to_json(request.form)
+    try:
+        f = request.form
+    except Exception as e1:
+        try:
+            f = request.get_json(force=True)
+        except Exception as e2:
+            return 'Failed 2'
     return f
