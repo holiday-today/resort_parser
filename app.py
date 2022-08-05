@@ -1,5 +1,7 @@
-from flask import Flask, request
-import json
+from flask import Flask, request, json
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 
@@ -30,7 +32,7 @@ def to_json(data):
     return post_json
 
 
-@app.route("/get/allresult", methods=["POST"])
+@app.route("/", methods=["POST"])
 def test():
     f = to_json(request.form)
     return f
