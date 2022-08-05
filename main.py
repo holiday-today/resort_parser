@@ -21,11 +21,6 @@ url_keys = {
 
 result_json = {}
 
-bla1 = open('itog.json', 'w', encoding='utf-8')
-bla1.close()
-bla1 = open('data.json', 'w', encoding='utf-8')
-bla1.close()
-
 def main():
     global url_keys
     url = main_url_rh
@@ -39,12 +34,13 @@ def main():
         else:
             url += key + '=' + str(value)
             url += '&'
-    
+    print(f'Getting url: {url}')
     r = ''
     print('Getting response Resort-Holiday...')
     
     try:
         r = requests.get(url, headers=headers)
+        print(r)
         soup = BeautifulSoup(r.text, features="html.parser")
     except Exception as e:
         print('Reconnect...')
@@ -129,6 +125,7 @@ def main():
 
 
 def start(server_data):
+    print('main parser start')
     global url_keys
     url_keys = {
         'STATEINC': server_data['STATEINC'],           
@@ -148,5 +145,6 @@ def start(server_data):
         'PRICEPAGE': 1,             
         'DOLOAD': 1                 
     }
+    print('get json:')
     print(url_keys)
     return main()
