@@ -5,14 +5,13 @@ import time
 from booking_parser import ParseBooking
 from connector import connect
 import traceback
-from fake_useragent import UserAgent
 
 main_url_rh = 'https://search.resort-holiday.com/search_hotel?'
 
 headers = {
     	'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
         'Content-type': 'text/html; charset=utf-8', 
-        'user-agent': UserAgent().random
+        'user-agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.148 YaBrowser/22.7.2.902 Yowser/2.5 Safari/537.36'
 }
 
 # пример
