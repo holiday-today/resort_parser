@@ -1,17 +1,41 @@
-from flask import Flask, json, request
-import logging
-
-logging.basicConfig(level=logging.DEBUG)
+from flask import Flask, jsonify, request
+from flask_restful import Api, Resource
+import main
+import json
 
 app = Flask(__name__)
 
-@app.route('/')
-def index():
-    cok = {
-        "query": 123,
-        "pageview_id": "f3ae6db9c405036b",
-        "aid": 304142,
-        "language": "ru",
-        "size": 5
+def to_json(data):
+    post_json = {
+        'STATEINC': None,           
+        'CHECKIN_BEG': None,  
+        'CHECKIN_END': None,  
+        'NIGHTS_FROM': None,         
+        'NIGHTS_TILL': None,         
+        'ADULT': None,               
+        'CHILD': None,               
+        'AGES': [],
+        'CURRENCY': '1',            
+        'TOWNS': [],
+        'HOTELS': [],
+        'MEALS': [],
+        'STARS': [],
+        'FILTER': '1',              
+        'PRICEPAGE': 1,             
+        'DOLOAD': 1                 
     }
-    return cok
+    for el in data:
+        if post_json[el] is None:
+            post_json[el] = data[el]
+        else:
+            post_json[el].append(data[el])
+    return post_json
+
+
+@app.route("/get/allresult", methods=["POST"])
+def test():
+    f = to_json(request.form)
+    return f
+
+if __name__ == "__main__":
+    app.run(debug=True)
