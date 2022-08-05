@@ -1,4 +1,5 @@
 from flask import Flask, request, json
+import main
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
@@ -36,5 +37,5 @@ def test():
     try:
         f = request.json
     except Exception as e1:
-        return 'Bad response json'
-    return to_main_json(f)
+        return 'Bad response json :('
+    return main.start(to_main_json(f))
