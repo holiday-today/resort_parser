@@ -29,7 +29,8 @@ def to_main_json(data):
         if post_json[el] is None:
             post_json[el] = data[el]
         else:
-            post_json[el].append(data[el])
+            for i in data[el]:
+                post_json[el].append(i)
     return post_json
 
 @app.route("/", methods=["POST"])
