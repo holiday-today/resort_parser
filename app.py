@@ -33,4 +33,4 @@ def to_json(data):
 @app.route("/get/allresult", methods=["POST"])
 def test():
     f = to_json(request.form)
-    return 
+    return f
