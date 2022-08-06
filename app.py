@@ -22,11 +22,11 @@ def to_main_json(data):
         'MEALS': [],
         'STARS': [],
         'FILTER': '1',              
-        'PRICEPAGE': 1,             
+        'PRICEPAGE': '1',             
         'DOLOAD': 1                 
     }
     for el in data:
-        if post_json[el] is None or isinstance(post_json[el], str) or isinstance(post_json[el], int):
+        if post_json[el] is None or isinstance(post_json[el], str):
             post_json[el] = data[el]
         elif post_json[el] == []:
             for i in data[el]:
