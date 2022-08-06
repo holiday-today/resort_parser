@@ -115,10 +115,6 @@ def main():
                     obj_resort['Price']['booking'] = None
             itog_page.append(obj_resort)
             #print('################################')
-            
-        result_json[url_keys['PRICEPAGE']] = itog_page
-        with open('data.json', 'w', encoding='utf-8') as f:
-            json.dump(result_json, f, ensure_ascii=False, indent=4)
 
         print('\n##################\nPage', (url_keys['PRICEPAGE']), 'is loaded!\n##################\n')
 
@@ -129,10 +125,12 @@ def main():
             else:
                 print(f'{url_keys["PRICEPAGE"]} pages loaded!')
                 result_json['LastPage'] = False
-                url_keys['PRICEPAGE'] += 1
         else:
             print('Last page loaded!')
-            result_json['LastPage'] = True
+            result_json['LastPage'] = True'
+        result_json[url_keys['PRICEPAGE']] = itog_page
+        with open('data.json', 'w', encoding='utf-8') as f:
+            json.dump(result_json, f, ensure_ascii=False, indent=4)
         return result_json
     except Exception as e:
         print('Something wrong! Try again...')
