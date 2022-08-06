@@ -26,9 +26,9 @@ def to_main_json(data):
         'DOLOAD': 1                 
     }
     for el in data:
-        if post_json[el] is None:
+        if post_json[el] is None or isinstance(post_json[el], str):
             post_json[el] = data[el]
-        else:
+        elif post_json[el] is []:
             for i in data[el]:
                 post_json[el].append(i)
     return post_json
