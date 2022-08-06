@@ -44,7 +44,8 @@ def test():
     return main.start(to_main_json(f))
 
 
-testing = {
+def get_testing():
+    testing = {
     "1": [
         {
             "Name": "Constance Ephelia Resort 5*",
@@ -152,7 +153,8 @@ testing = {
         }
     ]
 }
+    return testing
 
 @app.route("/result", methods=["POST"])
 def result():
-    return testing
+    return get_testing()
