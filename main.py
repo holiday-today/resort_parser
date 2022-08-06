@@ -87,11 +87,14 @@ def main():
 
         itog_page = []
         
-        bk = [k for k in bookHotels if bookHotels[k] != None]
+        bk = [k for k in bookHotels]
 
-        if len(bk) != 0:
-            hotel_table = connect(pagelist, bk, 'Name')
-            for c in hotel_table:
+        hotel_table = connect(pagelist, bk, 'Name')
+        for c in hotel_table:
+            if bookHotels[c[1][0]] == None:
+                obj_resort = c[0]
+                obj_resort['Price']['booking'] = None
+            else:
                 bk_rooms = [k for k in bookHotels[c[1][0]]]
                 new_list = connect([c[0]], bk_rooms, 'Room')
                 obj_resort = new_list[0][0]
@@ -110,8 +113,8 @@ def main():
                     obj_resort['booking_room_name'] = new_list[0][1][0]
                 else:
                     obj_resort['Price']['booking'] = None
-                itog_page.append(obj_resort)
-                #print('################################')
+            itog_page.append(obj_resort)
+            #print('################################')
             
         result_json[url_keys['PRICEPAGE']] = itog_page
         with open('data.json', 'w', encoding='utf-8') as f:
