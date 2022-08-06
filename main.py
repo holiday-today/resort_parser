@@ -130,6 +130,9 @@ def main():
                 print(f'{url_keys["PRICEPAGE"]} pages loaded!')
                 result_json['LastPage'] = False
                 url_keys['PRICEPAGE'] += 1
+        else:
+            print('Last page loaded!')
+            result_json['LastPage'] = True
         return result_json
     except Exception as e:
         print('Something wrong! Try again...')
