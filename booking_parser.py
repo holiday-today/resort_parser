@@ -19,6 +19,9 @@ headers = {
     }
 
 storage = {}
+with open('strings.json') as fout:
+    saved_data = json.load(fout)
+    storage = saved_data
 
 def ParseBooking(data):
     for el in data[:-1]:    
@@ -62,7 +65,7 @@ def ParseBooking(data):
             elif data[-1]['CUR'] == 'EUR':
                 cur = '€'
             
-            url_search = f'https://www.booking.com/searchresults.en-gb.html?dest_id={dest_id}&dest_type=hotel&checkin={str(checkin)}&checkout={str(checkout)}&group_adults={data[-1]["ADULT"]}&no_rooms=1&group_children={data[-1]["CHILD"]}&selected_currency={data[-1]["CUR"]}'
+            url_search = f'https://www.booking.com/searchresults.en-gb.html?dest_id={dest_id}&dest_type=hotel&checkin={str(checkin)}&checkout={str(checkout)}&group_adults={data[-1]["ADULT"]}&no_rooms=1&group_children={data[-1]["CHILD"]}'
             for age in data[-1]["AGES"]:
                 url_search += f'&age={str(age)}'
 
@@ -70,6 +73,8 @@ def ParseBooking(data):
             soup = BeautifulSoup(r.text, features="html.parser")
             
             url_hotel = soup.select_one('.e13098a59f').get('href')
+            url_hotel = url_hotel.split('&checkin=')
+            url_hotel = url_hotel[0] + '&selected_currency=' + data[-1]['CUR'] + '&checkin=' + url_hotel[1]
             r = requests.get(url_hotel, headers=headers)
             
             soup = BeautifulSoup(r.text, features="html.parser")
@@ -139,7 +144,8 @@ def ParseBooking(data):
             storage[s] = params
             print(f'{s} added!')
 
-    #with open('itog.json', 'w', encoding='utf-8') as f:
-    #    json.dump(storage, f, ensure_ascii=False, indent=4)
+    with open('itog.json', 'w', encoding='utf-8') as f:
+        print('Wroten to file!')
+        json.dump(storage, f, ensure_ascii=False, indent=4)
 
     return storage
