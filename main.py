@@ -33,28 +33,28 @@ def main():
         else:
             url += key + '=' + str(value)
             url += '&'
+    
     print(f'Getting url: {url}')
     r = ''
     print('Getting response Resort-Holiday...')
     
     try:
         r = requests.get(url, headers=headers)
-        print(r)
         soup = BeautifulSoup(r.text, features="html.parser")
     except Exception as e:
         print('Reconnect...')
         return main()
     try:
         print('Get list...')   
-        html_tags = soup.select('[class*="price_info"]')
+        html_tags = soup.select_one('.resultset').select_one('table').select_one('tbody').select('[class*="price_info"]')
         pagelist = []
         
         for i in html_tags:
             if i.select_one('.btn-group'):
                 continue
-            
+
             h = {}
-            h['Name'] = i.select_one('.link-hotel').select_one('a').text.replace('\n', '')
+            h['Name'] = i.select_one('.link-hotel').text.replace('\n', '')[2:].split('(')[-2].split('*')[0]
             h['Date'] = i.select_one('.sortie').text.replace('\n', '')
             h['Nights'] = i.select_one('.c').text.replace('\n', '')
             h['Food'] = i.select('td:not([class])')[1].text.replace('\n', '')
@@ -70,7 +70,7 @@ def main():
     except:
         print('Broken values! Try load page again...')
         print(traceback.print_exc())
-        return main()
+        return {'error': 'Broken values! Try load page again...'}
     try:
         print('Start parse Booking.com...')
 
@@ -81,35 +81,37 @@ def main():
             cur = 'EUR'
 
         ppl = pagelist.copy()
-        ppl.append({"ADULT": int(url_keys['ADULT']), "CHILD": int(url_keys['CHILD']), "AGES": url_keys['AGES'], "CUR":cur})
+        ppl.append({"ADULT": int(url_keys['ADULT']), "CHILD": int(url_keys['CHILD']), "AGES": url_keys['AGES'], 'CUR':cur})
         
         bookHotels = ParseBooking(ppl)
 
-        bk = [k for k in bookHotels]
-        hotel_table = connect(pagelist, bk, 'Name')
         itog_page = []
         
-        for c in hotel_table:
-            bk_rooms = [k for k in bookHotels[c[1][0]]]
-            new_list = connect([c[0]], bk_rooms, 'Room')
-            obj_resort = new_list[0][0]
-            if new_list[0][1] != []:
-                obj_booking = bookHotels[c[1][0]][new_list[0][1][0]]['Types']
-                obj_book_price = [x['Price'] for x in obj_booking if x['Sleeps'] == obj_resort['Sleeps']]
-                for obj_pr in obj_book_price:
-                    if obj_resort['Food'] in obj_pr:
-                        obj_resort['Price']['booking'] = obj_pr[obj_resort['Food']]
-                if not 'booking' in obj_resort['Price']:
+        bk = [k for k in bookHotels]
+
+        if len(bk) != 0:
+            hotel_table = connect(pagelist, bk, 'Name')
+            for c in hotel_table:
+                bk_rooms = [k for k in bookHotels[c[1][0]]]
+                new_list = connect([c[0]], bk_rooms, 'Room')
+                obj_resort = new_list[0][0]
+                if new_list[0][1] != []:
+                    obj_booking = bookHotels[c[1][0]][new_list[0][1][0]]['Types']
+                    obj_book_price = [x['Price'] for x in obj_booking if x['Sleeps'] == obj_resort['Sleeps']]
                     for obj_pr in obj_book_price:
-                        if '|'+obj_resort['Food'] in obj_pr:
-                            obj_resort['Price']['booking'] = obj_pr['|'+obj_resort['Food']]
+                        if obj_resort['Food'] in obj_pr:
+                            obj_resort['Price']['booking'] = obj_pr[obj_resort['Food']]
                     if not 'booking' in obj_resort['Price']:
-                        obj_resort['Price']['booking'] = None
-                obj_resort['booking_room_name'] = new_list[0][1][0]
-            else:
-                obj_resort['Price']['booking'] = None
-            itog_page.append(obj_resort)
-            #print('################################')
+                        for obj_pr in obj_book_price:
+                            if '|'+obj_resort['Food'] in obj_pr:
+                                obj_resort['Price']['booking'] = obj_pr['|'+obj_resort['Food']]
+                        if not 'booking' in obj_resort['Price']:
+                            obj_resort['Price']['booking'] = None
+                    obj_resort['booking_room_name'] = new_list[0][1][0]
+                else:
+                    obj_resort['Price']['booking'] = None
+                itog_page.append(obj_resort)
+                #print('################################')
             
         result_json[url_keys['PRICEPAGE']] = itog_page
         with open('data.json', 'w', encoding='utf-8') as f:
@@ -130,8 +132,8 @@ def main():
 
 
 def start(server_data):
-    print('main parser start')
     global url_keys
+    print('main parser start')
     url_keys = {
         'STATEINC': server_data['STATEINC'],           
         'CHECKIN_BEG': server_data['CHECKIN_BEG'],  
@@ -150,6 +152,6 @@ def start(server_data):
         'PRICEPAGE': 1,             
         'DOLOAD': 1                 
     }
-    print('get json:')
+    print('Get json:')
     print(url_keys)
     return main()
