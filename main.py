@@ -114,7 +114,7 @@ def main():
                 else:
                     obj_resort['Price']['booking'] = None
             itog_page.append(obj_resort)
-            #print('################################'
+            #print('################################')
         result_json[url_keys['PRICEPAGE']] = itog_page
         with open('data.json', 'w', encoding='utf-8') as f:
             json.dump(result_json, f, ensure_ascii=False, indent=4)
@@ -123,13 +123,13 @@ def main():
         if soup.select_one('.pager'):
             if soup.select_one('.pager').select('span')[-1].get('class')[0] == 'current_page':
                 print('Last page loaded!')
-                result_json[url_keys['PRICEPAGE']]['LastPage'] = True
+                result_json[url_keys['PRICEPAGE']].append({'LastPage': True})
             else:
                 print(f'{url_keys["PRICEPAGE"]} pages loaded!')
-                result_json[url_keys['PRICEPAGE']]['LastPage'] = False
+                result_json[url_keys['PRICEPAGE']].append({'LastPage': False})
         else:
             print('Last page loaded!')
-            result_json[url_keys['PRICEPAGE']]['LastPage'] = True
+            result_json[url_keys['PRICEPAGE']].append({'LastPage': True})
         
         return result_json
     except Exception as e:
