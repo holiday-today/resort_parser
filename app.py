@@ -33,13 +33,8 @@ def to_main_json(data):
                 post_json[el].append(i)
     return post_json
 
-test_item = 0
-
 @app.route("/", methods=["POST"])
 def test():
-    global test_item
-    print(f'test_item: {test_item}')
-    test_item += 1
     try:
         f = request.json
     except Exception as e1:
