@@ -127,7 +127,7 @@ def main():
                 result_json['LastPage'] = False
         else:
             print('Last page loaded!')
-            result_json['LastPage'] = True'
+            result_json['LastPage'] = True
         result_json[url_keys['PRICEPAGE']] = itog_page
         with open('data.json', 'w', encoding='utf-8') as f:
             json.dump(result_json, f, ensure_ascii=False, indent=4)
