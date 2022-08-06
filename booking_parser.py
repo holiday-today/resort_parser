@@ -64,6 +64,8 @@ def ParseBooking(data):
                 cur = 'RUB'
             elif data[-1]['CUR'] == 'EUR':
                 cur = '€'
+                
+            print('MyCUR', cur)
             
             url_search = f'https://www.booking.com/searchresults.en-gb.html?dest_id={dest_id}&dest_type=hotel&checkin={str(checkin)}&checkout={str(checkout)}&group_adults={data[-1]["ADULT"]}&no_rooms=1&group_children={data[-1]["CHILD"]}'
             for age in data[-1]["AGES"]:
@@ -75,6 +77,7 @@ def ParseBooking(data):
             url_hotel = soup.select_one('.e13098a59f').get('href')
             url_hotel = url_hotel.split('&checkin=')
             url_hotel = url_hotel[0] + '&selected_currency=' + data[-1]['CUR'] + '&checkin=' + url_hotel[1]
+            print(url_hotel)
             r = requests.get(url_hotel, headers=headers)
             
             soup = BeautifulSoup(r.text, features="html.parser")
