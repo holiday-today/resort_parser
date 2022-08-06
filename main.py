@@ -52,6 +52,7 @@ def main():
         for i in html_tags:
             if i.select_one('.btn-group'):
                 continue
+            print('%%%%%%%%CHECK!%%%%%%%%%%', i.select_one('.link-hotel'))
             
             h = {}
             h['Name'] = i.select_one('.link-hotel').select_one('a').text.replace('\n', '')
