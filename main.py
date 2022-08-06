@@ -55,7 +55,6 @@ def main():
             
             h = {}
             h['Name'] = i.select_one('.link-hotel').select_one('a').text.replace('\n', '')
-#             h['Name'] = i.select_one('.link-hotel').text.replace('\n', '')
             h['Date'] = i.select_one('.sortie').text.replace('\n', '')
             h['Nights'] = i.select_one('.c').text.replace('\n', '')
             h['Food'] = i.select('td:not([class])')[1].text.replace('\n', '')
@@ -113,8 +112,8 @@ def main():
             #print('################################')
             
         result_json[url_keys['PRICEPAGE']] = itog_page
-        #with open('data.json', 'w', encoding='utf-8') as f:
-        #    json.dump(result_json, f, ensure_ascii=False, indent=4)
+        with open('data.json', 'w', encoding='utf-8') as f:
+            json.dump(result_json, f, ensure_ascii=False, indent=4)
 
         print('\n##################\nPage', (url_keys['PRICEPAGE']), 'is loaded!\n##################\n')
 
