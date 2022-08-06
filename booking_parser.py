@@ -19,9 +19,9 @@ headers = {
     }
 
 storage = {}
-with open('strings.json') as fout:
-    saved_data = json.load(fout)
-    storage = saved_data
+#with open('itog.json') as fout:
+#    saved_data = json.load(fout)
+#    storage = saved_data
 
 def ParseBooking(data):
     for el in data[:-1]:    
