@@ -62,7 +62,7 @@ def ParseBooking(data):
             elif data[-1]['CUR'] == 'EUR':
                 cur = '€'
             
-            url_search = f'https://www.booking.com/searchresults.en-gb.html?dest_id={dest_id}&dest_type=hotel&checkin={str(checkin)}&checkout={str(checkout)}&group_adults={data[-1]["ADULT"]}&no_rooms=1&group_children={data[-1]["CHILD"]}&selected_currency={data[-1]['CUR']}'
+            url_search = f'https://www.booking.com/searchresults.en-gb.html?dest_id={dest_id}&dest_type=hotel&checkin={str(checkin)}&checkout={str(checkout)}&group_adults={data[-1]["ADULT"]}&no_rooms=1&group_children={data[-1]["CHILD"]}&selected_currency={data[-1]["CUR"]}'
             for age in data[-1]["AGES"]:
                 url_search += f'&age={str(age)}'
 
