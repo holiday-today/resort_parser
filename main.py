@@ -125,8 +125,10 @@ def main():
         if soup.select_one('.pager'):
             if soup.select_one('.pager').select('span')[-1].get('class')[0] == 'current_page':
                 print('Last page loaded!')
+                result_json['LastPage'] = True
             else:
                 print(f'{url_keys["PRICEPAGE"]} pages loaded!')
+                result_json['LastPage'] = False
                 url_keys['PRICEPAGE'] += 1
         return result_json
     except Exception as e:
