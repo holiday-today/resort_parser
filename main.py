@@ -81,7 +81,7 @@ def main():
             cur = 'EUR'
 
         ppl = pagelist.copy()
-        ppl.append({"ADULT": int(url_keys['ADULT']), "CHILD": int(url_keys['CHILD']), "AGES": url_keys['AGES'], 'CUR':cur})
+        ppl.append({"ADULT": int(url_keys['ADULT']), "CHILD": int(url_keys['CHILD']), "AGES": url_keys['AGES'], "CUR":cur})
         
         bookHotels = ParseBooking(ppl)
 
@@ -141,7 +141,7 @@ def start(server_data):
         'ADULT': server_data['ADULT'],               
         'CHILD': server_data['CHILD'],               
         'AGES': server_data['AGES'],
-        'CURRENCY': '1',            
+        'CURRENCY': server_data['CURRENCY'],
         'TOWNS': server_data['TOWNS'],
         'HOTELS': server_data['HOTELS'],
         'MEALS': server_data['MEALS'],
