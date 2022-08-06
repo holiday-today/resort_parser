@@ -25,7 +25,7 @@ storage = {}
 
 def ParseBooking(data):
     for el in data[:-1]:    
-        s = el['Name'].split('*')[0][:-2].split('Guest House')[0]
+        s = el['Name'].split('Guest House')[0]
         if s in storage:
             pass
         else:
@@ -65,7 +65,7 @@ def ParseBooking(data):
             elif data[-1]['CUR'] == 'EUR':
                 cur = '€'
                 
-            print('MyCUR', cur)
+            print('Currenty:', cur)
             
             url_search = f'https://www.booking.com/searchresults.en-gb.html?dest_id={dest_id}&dest_type=hotel&checkin={str(checkin)}&checkout={str(checkout)}&group_adults={data[-1]["ADULT"]}&no_rooms=1&group_children={data[-1]["CHILD"]}'
             for age in data[-1]["AGES"]:
