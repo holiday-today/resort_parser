@@ -37,6 +37,7 @@ test_item = 0
 
 @app.route("/", methods=["POST"])
 def test():
+    global test_item
     print(f'test_item: {test_item}')
     test_item += 1
     try:
