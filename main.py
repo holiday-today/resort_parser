@@ -87,7 +87,7 @@ def main():
 
         itog_page = []
         
-        bk = [k for k in bookHotels]
+        bk = [k for k in bookHotels if bookHotels[k] != None]
 
         if len(bk) != 0:
             hotel_table = connect(pagelist, bk, 'Name')
