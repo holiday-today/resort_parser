@@ -55,8 +55,14 @@ def ParseBooking(data):
             dt = el["Date"][:-4].split('.')
             checkin = datetime.date(int(dt[2]), int(dt[1]), int(dt[0]))
             checkout = checkin + datetime.timedelta(days=int(el["Nights"]))
+
+            cur = ''
+            if data[-1]['CUR'] == 'RUB':
+                cur = 'RUB'
+            elif data[-1]['CUR'] == 'EUR':
+                cur = '€'
             
-            url_search = f'https://www.booking.com/searchresults.en-gb.html?dest_id={dest_id}&dest_type=hotel&checkin={str(checkin)}&checkout={str(checkout)}&group_adults={data[-1]["ADULT"]}&no_rooms=1&group_children={data[-1]["CHILD"]}'
+            url_search = f'https://www.booking.com/searchresults.en-gb.html?dest_id={dest_id}&dest_type=hotel&checkin={str(checkin)}&checkout={str(checkout)}&group_adults={data[-1]["ADULT"]}&no_rooms=1&group_children={data[-1]["CHILD"]}&selected_currency={data[-1]['CUR']}'
             for age in data[-1]["AGES"]:
                 url_search += f'&age={str(age)}'
 
@@ -95,8 +101,8 @@ def ParseBooking(data):
                     sleeps = sleeps[0]
 
                 price = {}
-                priceDefault = int(room.select_one('.prco-valign-middle-helper').text.replace('\n', ' ').split('RUB')[-1][1:].replace(',', ''))
-                nalog = room.select_one('[class*="prd-taxes-and-fees-under-price"]').text.split('RUB')
+                priceDefault = int(room.select_one('.prco-valign-middle-helper').text.replace('\n', ' ').split(cur)[-1][1:].replace(',', ''))
+                nalog = room.select_one('[class*="prd-taxes-and-fees-under-price"]').text.split(cur)
                 if len(nalog) == 2:
                     nalog = int(nalog[1].split(' ')[0][1:].replace(',', ''))
                     priceDefault += nalog
@@ -115,7 +121,7 @@ def ParseBooking(data):
 
                 dopMeals = room.select_one(".bui-modal__header")
                 t = BeautifulSoup(str(dopMeals), features="html.parser")
-                t = t.select_one('p').text.split('RUB')
+                t = t.select_one('p').text.split(cur)
                 if len(t) > 1:
                     t_low = t[0].lower()
                     dopPrice = int(t[1].split(' ')[0][1:].replace(',', '')) * int(el["Nights"]) * (data[-1]["ADULT"] + data[-1]["CHILD"])
@@ -133,7 +139,7 @@ def ParseBooking(data):
             storage[s] = params
             print(f'{s} added!')
 
-    with open('itog.json', 'w', encoding='utf-8') as f:
-        json.dump(storage, f, ensure_ascii=False, indent=4)
+    #with open('itog.json', 'w', encoding='utf-8') as f:
+    #    json.dump(storage, f, ensure_ascii=False, indent=4)
 
     return storage
