@@ -44,9 +44,9 @@ def test():
     return main.start(to_main_json(f))
 
 
-def get_testing():
+def gettesting():
     testing = {
-    "1": [
+        "1": [
         {
             "Name": "Constance Ephelia Resort 5*",
             "Date": "05.09.2022, Пн",
@@ -72,89 +72,11 @@ def get_testing():
                 "booking": null
             },
             "booking_room_name": " Junior Suite "
-        },
-        {
-            "Name": "Constance Ephelia Resort 5*",
-            "Date": "05.09.2022, Пн",
-            "Nights": "3",
-            "Food": "Half Board",
-            "Room": "Senior Suite",
-            "Sleeps": "2+1",
-            "Price": {
-                "resort-holiday": 143183,
-                "booking": 182134
-            },
-            "booking_room_name": " Senior Suite "
-        },
-        {
-            "Name": "Constance Ephelia Resort 5*",
-            "Date": "05.09.2022, Пн",
-            "Nights": "3",
-            "Food": "Full Board",
-            "Room": "Senior Suite",
-            "Sleeps": "2+1",
-            "Price": {
-                "resort-holiday": 157552,
-                "booking": null
-            },
-            "booking_room_name": " Senior Suite "
-        },
-        {
-            "Name": "Constance Ephelia Resort 5*",
-            "Date": "05.09.2022, Пн",
-            "Nights": "3",
-            "Food": "Half Board",
-            "Room": "Senior Suite",
-            "Sleeps": "3",
-            "Price": {
-                "resort-holiday": 158451,
-                "booking": 191332
-            },
-            "booking_room_name": " Senior Suite "
-        },
-        {
-            "Name": "Constance Ephelia Resort 5*",
-            "Date": "05.09.2022, Пн",
-            "Nights": "3",
-            "Food": "Full Board",
-            "Room": "Senior Suite",
-            "Sleeps": "3",
-            "Price": {
-                "resort-holiday": 179941,
-                "booking": null
-            },
-            "booking_room_name": " Senior Suite "
-        },
-        {
-            "Name": "Constance Ephelia Resort 5*",
-            "Date": "05.09.2022, Пн",
-            "Nights": "3",
-            "Food": "Bed Breakfast",
-            "Room": "2 Bedroom Family Villa",
-            "Sleeps": "2+1",
-            "Price": {
-                "resort-holiday": 254996,
-                "booking": null
-            },
-            "booking_room_name": " Three-Bedroom Family Villa with Private Pool "
-        },
-        {
-            "Name": "Constance Ephelia Resort 5*",
-            "Date": "05.09.2022, Пн",
-            "Nights": "3",
-            "Food": "Bed Breakfast",
-            "Room": "2 Bedroom Family Villa",
-            "Sleeps": "3",
-            "Price": {
-                "resort-holiday": 254996,
-                "booking": null
-            },
-            "booking_room_name": " Three-Bedroom Family Villa with Private Pool "
         }
-    ]
-}
+        ]
+    }
     return testing
 
 @app.route("/result", methods=["POST"])
 def result():
-    return get_testing()
+    return gettesting()
