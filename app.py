@@ -47,5 +47,3 @@ def test():
     print('we have json!')
     print(f)
     return main.start(to_main_json(f))
-
-app.run()
