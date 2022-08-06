@@ -75,8 +75,14 @@ def main():
     try:
         print('Start parse Booking.com...')
 
+        cur = ''
+        if url_keys['CURRENCY'] == '1':
+            cur = 'RUB'
+        elif url_keys['CURRENCY'] == '3':
+            cur = 'EUR'
+
         ppl = pagelist.copy()
-        ppl.append({"ADULT": int(url_keys['ADULT']), "CHILD": int(url_keys['CHILD']), "AGES": url_keys['AGES']})
+        ppl.append({"ADULT": int(url_keys['ADULT']), "CHILD": int(url_keys['CHILD']), "AGES": url_keys['AGES'], 'CUR':cur})
         
         bookHotels = ParseBooking(ppl)
 
@@ -107,8 +113,8 @@ def main():
             #print('################################')
             
         result_json[url_keys['PRICEPAGE']] = itog_page
-        with open('data.json', 'w', encoding='utf-8') as f:
-            json.dump(result_json, f, ensure_ascii=False, indent=4)
+        #with open('data.json', 'w', encoding='utf-8') as f:
+        #    json.dump(result_json, f, ensure_ascii=False, indent=4)
 
         print('\n##################\nPage', (url_keys['PRICEPAGE']), 'is loaded!\n##################\n')
 
