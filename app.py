@@ -2,6 +2,7 @@ from flask import Flask, request, json
 import main
 import logging
 from flask_cors import CORS
+import parse_resort_states
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -37,7 +38,7 @@ def to_main_json(data):
     return post_json
 
 @app.route("/", methods=["POST"])
-def test():
+def get_full_response():
     try:
         f = request.json
     except Exception as e1:
@@ -45,3 +46,11 @@ def test():
     print('we have json!')
     print(f)
     return main.start(to_main_json(f))
+
+@app.route("/state", methods=["GET"])
+def get_states():
+    return parse_resort_states.start()
+
+@app.route("/city/<int:state_id>", methods=["GET"])
+def get_cities(state_id):
+    return parse_resort_states.start(state_id)
