@@ -27,7 +27,7 @@ def ParseBooking(data):
     for el in data[:-1]:    
         s = el['Name'].split('Guest House')[0]
         if s in storage:
-            pass
+            print(s, "in storage!")
         else:
             cok["query"] = s
             r = requests.post(url_getid, json=cok)
@@ -64,6 +64,8 @@ def ParseBooking(data):
                 cur = 'RUB'
             elif data[-1]['CUR'] == 'EUR':
                 cur = '€'
+                
+            print('MyCur:', cur)
             
             url_search = f'https://www.booking.com/searchresults.en-gb.html?dest_id={dest_id}&dest_type=hotel&checkin={str(checkin)}&checkout={str(checkout)}&group_adults={data[-1]["ADULT"]}&no_rooms=1&group_children={data[-1]["CHILD"]}'
             for age in data[-1]["AGES"]:
