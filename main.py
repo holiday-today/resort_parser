@@ -63,8 +63,7 @@ def main():
             h['Room'] = room_text[0]
             h['Sleeps'] = room_text[1].split('(')[0].split(' ')[0]
             
-            h['Price'] = {}
-            h['Price']['resort-holiday'] = int(i.select_one('.td_price').text.replace('\n', '').split(' ')[0])
+            h['Price_resort'] = int(i.select_one('.td_price').text.replace('\n', '').split(' ')[0])
             
             pagelist.append(h)
     except:
@@ -93,7 +92,7 @@ def main():
         for c in hotel_table:
             if bookHotels[c[1][0]] == None:
                 obj_resort = c[0]
-                obj_resort['Price']['booking'] = None
+                obj_resort['Price_booking'] = None
             else:
                 bk_rooms = [k for k in bookHotels[c[1][0]]]
                 new_list = connect([c[0]], bk_rooms, 'Room')
@@ -103,16 +102,16 @@ def main():
                     obj_book_price = [x['Price'] for x in obj_booking if x['Sleeps'] == obj_resort['Sleeps']]
                     for obj_pr in obj_book_price:
                         if obj_resort['Food'] in obj_pr:
-                            obj_resort['Price']['booking'] = obj_pr[obj_resort['Food']]
-                    if not 'booking' in obj_resort['Price']:
+                            obj_resort['Price booking'] = obj_pr[obj_resort['Food']]
+                    if not 'Price_booking' in obj_resort:
                         for obj_pr in obj_book_price:
                             if '|'+obj_resort['Food'] in obj_pr:
-                                obj_resort['Price']['booking'] = obj_pr['|'+obj_resort['Food']]
-                        if not 'booking' in obj_resort['Price']:
-                            obj_resort['Price']['booking'] = None
+                                obj_resort['Price_booking'] = obj_pr['|'+obj_resort['Food']]
+                        if not 'Price_booking' in obj_resort:
+                            obj_resort['Price_booking'] = None
                     obj_resort['booking_room_name'] = new_list[0][1][0]
                 else:
-                    obj_resort['Price']['booking'] = None
+                    obj_resort['Price_booking'] = None
             itog_page.append(obj_resort)
             #print('################################')
         result_json[url_keys['PRICEPAGE']] = itog_page
