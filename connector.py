@@ -2,12 +2,7 @@ def sres(a, b):
 	a = a.lower().split(' ')
 	b = b.lower().split(' ')
 	c = set(a) & set(b)
-	r = 0
-	for i in (set(a) - c):
-		for j in (set(b) - c):
-			if i in j or j in i:
-				r+=1
-	return len(c)+r
+	return len(c)
 
 
 def connect(list1, list2, key):
