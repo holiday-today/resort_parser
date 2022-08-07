@@ -1,10 +1,13 @@
 from flask import Flask, request, json
 import main
 import logging
+from flask_cors import CORS
 
 logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
+
+CORS(app)
 
 def to_main_json(data):
     post_json = {
