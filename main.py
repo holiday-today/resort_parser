@@ -54,7 +54,10 @@ def main():
                 continue
 
             h = {}
-            h['Name'] = i.select_one('.link-hotel').text.replace('\n', '')[2:].split('(')[-2].split('*')[0]
+            h['Name'] = i.select_one('.link-hotel').text.replace('\n', '')[2:].split('(')[-2]
+            if '*' in h['Name']:
+                h['Name'] = h['Name'].split('*')[0][:-2]
+            
             h['Date'] = i.select_one('.sortie').text.replace('\n', '')
             h['Nights'] = i.select_one('.c').text.replace('\n', '')
             h['Food'] = i.select('td:not([class])')[1].text.replace('\n', '')
