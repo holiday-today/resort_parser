@@ -1,12 +1,24 @@
+import re
+
 def sres(a, b):
-	a = a.lower().split(' ')
-	b = b.lower().split(' ')
+	a = re.split(' |-', a.lower())
+	b = re.split(' |-', b.lower())
 	c = set(a) & set(b)
 	return len(c)
 
+def chng(mylist):
+	newlist = []
+	for x in mylist:
+		t = x.lower().replace('one', '1')
+		t = t.lower().replace('two', '2')
+		t = t.lower().replace('three', '3')
+		newlist.append(t)
+	return newlist
 
 def connect(list1, list2, key):
 	list3 = []
+	list1 = chng(list1)
+	list2 = chng(list2)
 	for i in list1:
 		max_q = 0
 		q_id = []
@@ -34,7 +46,7 @@ def connect(list1, list2, key):
 			min_q = 99
 			s = []
 			for j in q_id:
-				q = len(j.split(' '))-sres(i[0][key], j)
+				q = len(re.split(' |-', j))-sres(i[0][key], j)
 				if q < min_q:
 					min_q = q
 					s = [j]
