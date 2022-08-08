@@ -57,6 +57,8 @@ def main():
             h['Name'] = i.select_one('.link-hotel').text.replace('\n', '')[2:].split('(')[-2]
             if '*' in h['Name']:
                 h['Name'] = h['Name'].split('*')[0][:-2]
+            if h['Name'][0] == ' ':
+                h['Name'] = h['Name'][1:]
             
             h['Date'] = i.select_one('.sortie').text.replace('\n', '')
             h['Nights'] = i.select_one('.c').text.replace('\n', '')
@@ -100,6 +102,21 @@ def main():
                 bk_rooms = [k for k in bookHotels[c[1][0]]]
                 new_list = connect([c[0]], bk_rooms, 'Room')
                 obj_resort = new_list[0][0]
+                if len(new_list[0][1]) > 1:
+                    zzz = new_list[0][1]
+                    tmp_hotel = 0
+                    for z in range(len(zzz)):
+                        hs = False
+                        for bzt in bookHotels[c[1][0]][zzz[tmp_hotel]]['Types']:
+                            if bzt['Sleeps'] == obj_resort['Sleeps']:
+                                hs = True
+                                break
+                        if not hs:
+                            new_list[0][1].pop(tmp_hotel)
+                            tmp_hotel -= 1
+                        tmp_hotel += 1
+                    if len(new_list[0][1]) > 1:
+                        new_list[0][1] = []
                 if new_list[0][1] != []:
                     obj_booking = bookHotels[c[1][0]][new_list[0][1][0]]['Types']
                     obj_book_price = [x['Price'] for x in obj_booking if x['Sleeps'] == obj_resort['Sleeps']]
