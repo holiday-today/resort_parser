@@ -26,6 +26,8 @@ storage = {}
 def ParseBooking(data):
     for el in data[:-1]:    
         s = el['Name'].split('Guest House')[0]
+        if s[0] == ' ':
+            s = s[1:]
         if s in storage:
             print(s, "in storage!")
         else:
@@ -89,6 +91,7 @@ def ParseBooking(data):
             for room in rooms:
                 if not room.select_one('.bui-u-sr-only'):
                     continue
+
                 if room.select_one('[class*="-first"]'):
                     currentRoom = room.select_one('.hprt-roomtype-icon-link').text.replace('\n', ' ')
                     RoomBed = ''
@@ -144,11 +147,16 @@ def ParseBooking(data):
 
                 params[currentRoom]['Types'].append({'Sleeps': sleeps, 'Price': price})
 
+            params = {key:value for key, value in params.items() if value['Types'] != []}
             storage[s] = params
             print(f'{s} added!')
+            if params == {}:
+                print(f'{s} is empty!')
+
+    res_data = {key:value for key, value in storage.items() if value != {}}
 
     with open('itog.json', 'w', encoding='utf-8') as f:
         print('Wroten to file!')
-        json.dump(storage, f, ensure_ascii=False, indent=4)
+        json.dump(res_data, f, ensure_ascii=False, indent=4)
 
-    return storage
+    return res_data
