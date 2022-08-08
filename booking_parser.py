@@ -125,7 +125,7 @@ def ParseBooking(data):
                 elif 'breakfast' in meals and 'included' in meals:
                     price['Bed Breakfast'] = priceDefault
                 else:
-                    price['No meal'] = priceDefault
+                    price['Без питания'] = priceDefault
 
                 dopMeals = room.select_one(".bui-modal__header")
                 t = BeautifulSoup(str(dopMeals), features="html.parser")
