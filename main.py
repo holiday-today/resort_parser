@@ -57,9 +57,11 @@ def main():
             h['Name'] = i.select_one('.link-hotel').text.replace('\n', '')[2:].split('(')[-2]
             if '*' in h['Name']:
                 h['Name'] = h['Name'].split('*')[0][:-2]
-            if h['Name'][0] == ' ':
+            while not h['Name'][0].isalpha():
                 h['Name'] = h['Name'][1:]
-            
+            while not h['Name'][-1].isalpha():
+                h['Name'] = h['Name'][:-1]
+
             h['Date'] = i.select_one('.sortie').text.replace('\n', '')
             h['Nights'] = i.select_one('.c').text.replace('\n', '')
             h['Food'] = i.select('td:not([class])')[1].text.replace('\n', '')
@@ -86,54 +88,54 @@ def main():
 
         ppl = pagelist.copy()
         ppl.append({"ADULT": int(url_keys['ADULT']), "CHILD": int(url_keys['CHILD']), "AGES": url_keys['AGES'], 'CUR':cur})
-        
+
         bookHotels = ParseBooking(ppl)
 
         itog_page = []
         
         bk = [k for k in bookHotels]
-
-        hotel_table = connect(pagelist, bk, 'Name')
-        for c in hotel_table:
-            if bookHotels[c[1][0]] == None:
-                obj_resort = c[0]
-                obj_resort['Price_booking'] = None
-            else:
-                bk_rooms = [k for k in bookHotels[c[1][0]]]
-                new_list = connect([c[0]], bk_rooms, 'Room')
-                obj_resort = new_list[0][0]
-                if len(new_list[0][1]) > 1:
-                    zzz = new_list[0][1]
-                    tmp_hotel = 0
-                    for z in range(len(zzz)):
-                        hs = False
-                        for bzt in bookHotels[c[1][0]][zzz[tmp_hotel]]['Types']:
-                            if bzt['Sleeps'] == obj_resort['Sleeps']:
-                                hs = True
-                                break
-                        if not hs:
-                            new_list[0][1].pop(tmp_hotel)
-                            tmp_hotel -= 1
-                        tmp_hotel += 1
-                    if len(new_list[0][1]) > 1:
-                        new_list[0][1] = []
-                if new_list[0][1] != []:
-                    obj_booking = bookHotels[c[1][0]][new_list[0][1][0]]['Types']
-                    obj_book_price = [x['Price'] for x in obj_booking if x['Sleeps'] == obj_resort['Sleeps']]
-                    for obj_pr in obj_book_price:
-                        if obj_resort['Food'] in obj_pr:
-                            obj_resort['Price_booking'] = obj_pr[obj_resort['Food']]
-                    if not 'Price_booking' in obj_resort:
-                        for obj_pr in obj_book_price:
-                            if '|'+obj_resort['Food'] in obj_pr:
-                                obj_resort['Price_booking'] = obj_pr['|'+obj_resort['Food']]
-                        if not 'Price_booking' in obj_resort:
-                            obj_resort['Price_booking'] = None
-                    obj_resort['booking_room_name'] = new_list[0][1][0]
-                else:
+        if len(bk) != 0:
+            hotel_table = connect(pagelist, bk, 'Name')
+            for c in hotel_table:
+                if bookHotels[c[1][0]] == None:
+                    obj_resort = c[0]
                     obj_resort['Price_booking'] = None
-            itog_page.append(obj_resort)
-            #print('################################')
+                else:
+                    bk_rooms = [k for k in bookHotels[c[1][0]]]
+                    new_list = connect([c[0]], bk_rooms, 'Room')
+                    obj_resort = new_list[0][0]
+                    if len(new_list[0][1]) > 1:
+                        zzz = new_list[0][1]
+                        tmp_hotel = 0
+                        for z in range(len(zzz)):
+                            hs = False
+                            for bzt in bookHotels[c[1][0]][zzz[tmp_hotel]]['Types']:
+                                if bzt['Sleeps'] == obj_resort['Sleeps']:
+                                    hs = True
+                                    break
+                            if not hs:
+                                new_list[0][1].pop(tmp_hotel)
+                                tmp_hotel -= 1
+                            tmp_hotel += 1
+                        if len(new_list[0][1]) > 1:
+                            new_list[0][1] = []
+                    if new_list[0][1] != []:
+                        obj_booking = bookHotels[c[1][0]][new_list[0][1][0]]['Types']
+                        obj_book_price = [x['Price'] for x in obj_booking if x['Sleeps'] == obj_resort['Sleeps']]
+                        for obj_pr in obj_book_price:
+                            if obj_resort['Food'] in obj_pr:
+                                obj_resort['Price_booking'] = obj_pr[obj_resort['Food']]
+                        if not 'Price_booking' in obj_resort:
+                            for obj_pr in obj_book_price:
+                                if '|'+obj_resort['Food'] in obj_pr:
+                                    obj_resort['Price_booking'] = obj_pr['|'+obj_resort['Food']]
+                            if not 'Price_booking' in obj_resort:
+                                obj_resort['Price_booking'] = None
+                        obj_resort['booking_room_name'] = new_list[0][1][0]
+                    else:
+                        obj_resort['Price_booking'] = None
+                itog_page.append(obj_resort)
+                #print('################################')Price
         result_json[url_keys['PRICEPAGE']] = itog_page
         with open('data.json', 'w', encoding='utf-8') as f:
             json.dump(result_json, f, ensure_ascii=False, indent=4)
@@ -144,7 +146,6 @@ def main():
                 print('Last page loaded!')
                 result_json[url_keys['PRICEPAGE']].append({'LastPage': True})
             else:
-                print(f'{url_keys["PRICEPAGE"]} pages loaded!')
                 result_json[url_keys['PRICEPAGE']].append({'LastPage': False})
         else:
             print('Last page loaded!')
