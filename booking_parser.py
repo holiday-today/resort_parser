@@ -154,8 +154,6 @@ def ParseBooking(data):
                 print(f'{s} is empty!')
 
     res_data = {key:value for key, value in storage.items() if value != {}}
-    
-    storage = {}
 
     with open('itog.json', 'w', encoding='utf-8') as f:
         print('Wroten to file!')
