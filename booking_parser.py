@@ -20,7 +20,11 @@ headers = {
 
 def ParseBooking(data):
     storage = {}
-    for el in data[:-1]:    
+    dt_id = 0
+    ld = len(data)-1
+    for el in data[:-1]:
+        dt_id += 1
+        print(f'{dt_id}/{ld}', end=' ')
         s = el['Name'].split('Guest House')[0]
         if s[0] == ' ':
             s = s[1:]
@@ -62,8 +66,6 @@ def ParseBooking(data):
                 cur = 'RUB'
             elif data[-1]['CUR'] == 'EUR':
                 cur = '€'
-                
-            print('MyCur:', cur)
             
             url_search = f'https://www.booking.com/searchresults.en-gb.html?dest_id={dest_id}&dest_type=hotel&checkin={str(checkin)}&checkout={str(checkout)}&group_adults={data[-1]["ADULT"]}&no_rooms=1&group_children={data[-1]["CHILD"]}'
             for age in data[-1]["AGES"]:
@@ -90,6 +92,12 @@ def ParseBooking(data):
 
                 if room.select_one('[class*="-first"]'):
                     currentRoom = room.select_one('.hprt-roomtype-icon-link').text.replace('\n', ' ')
+                    
+                    while not currentRoom[0].isalpha():
+                        currentRoom = currentRoom[1:]
+                    while not currentRoom[-1].isalpha():
+                        currentRoom = currentRoom[:-1]
+                    
                     RoomBed = ''
                     if 'double' in room.select_one('[class*="bed-types-wrapper"]').text:
                         RoomBed = 'double'
