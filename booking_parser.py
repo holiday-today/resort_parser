@@ -18,12 +18,8 @@ headers = {
             'user-agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.148 YaBrowser/22.7.2.902 Yowser/2.5 Safari/537.36'
     }
 
-storage = {}
-#with open('itog.json') as fout:
-#    saved_data = json.load(fout)
-#    storage = saved_data
-
 def ParseBooking(data):
+    storage = {}
     for el in data[:-1]:    
         s = el['Name'].split('Guest House')[0]
         if s[0] == ' ':
