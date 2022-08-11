@@ -41,13 +41,15 @@ def to_main_json(data):
 @app.route("/", methods=["POST"])
 def get_full_response():
     if __name__ == '__main__':
-        try:
-            f = request.json
-        except Exception as e1:
-            return 'Bad response json :('
-        print('we have json!')
-        print(f)
-        return main.start(to_main_json(f))
+        async_booking.qq()
+        return "1"
+        #try:
+        #    f = request.json
+        #except Exception as e1:
+        #    return 'Bad response json :('
+        #print('we have json!')
+        #print(f)
+        #return main.start(to_main_json(f))
 
 @app.route("/state", methods=["GET"])
 def get_states():
