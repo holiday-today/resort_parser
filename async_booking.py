@@ -150,7 +150,7 @@ loc_data = [
 
 async def get_hotel_data(session, hotel):
     async with session.get(hotel, headers=headers) as response2: #hotels_id[hotel]['url']
-        print('get_hotel_data')
+        print(response2)
         #soup = BeautifulSoup(await response2.text(), features="html.parser")
         #rooms = soup.select('[class*="js-rt-block-row"]')
         return await response2.text()
@@ -189,8 +189,9 @@ start_time = time.time()
 
 def my_function(a_el):
     for i in a_el:
+        print(len(i))
         soup = BeautifulSoup(i, features="html.parser")
-        print(time.time() - start_time)
+        #print(time.time() - start_time)
 
 def f(e):
     print(e)
