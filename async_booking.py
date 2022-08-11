@@ -200,7 +200,7 @@ def qq():
     print('q')
     print(__name__)
     freeze_support()
-    a = parsw()
+    a = asyncio.run(parsw())
     print(len(a))
     start_time = time.time()
     print(123)
