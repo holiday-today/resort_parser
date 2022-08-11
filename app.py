@@ -43,7 +43,7 @@ def to_main_json(data):
 def get_full_response():
     if __name__ == '__main__':
         async_booking.qq()
-        return "1"
+    return "1"
         #try:
         #    f = request.json
         #except Exception as e1:
