@@ -189,7 +189,7 @@ start_time = time.time()
 
 def my_function(a_el):
     for i in a_el:
-        #soup = BeautifulSoup(i, features="html.parser")
+        soup = BeautifulSoup(i, features="html.parser")
         print(time.time() - start_time)
 
 def f(e):
@@ -200,8 +200,7 @@ def qq():
     print('q')
     print(__name__)
     freeze_support()
-    a = ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 
-        'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a']
+    a = parsw()
     print(len(a))
     start_time = time.time()
     print(123)
