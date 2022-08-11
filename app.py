@@ -41,16 +41,13 @@ def to_main_json(data):
 
 @app.route("/", methods=["POST"])
 def get_full_response():
-    if __name__ == '__main__':
-        async_booking.qq()
-    return "1"
-        #try:
-        #    f = request.json
-        #except Exception as e1:
-        #    return 'Bad response json :('
-        #print('we have json!')
-        #print(f)
-        #return main.start(to_main_json(f))
+    try:
+        f = request.json
+    except Exception as e1:
+        return 'Bad response json :('
+    print('we have json!')
+    print(f)
+    return main.start(to_main_json(f))
 
 @app.route("/state", methods=["GET"])
 def get_states():
@@ -59,3 +56,9 @@ def get_states():
 @app.route("/city/<int:state_id>", methods=["GET"])
 def get_cities(state_id):
     return parse_resort_states.start(state_id)
+
+@app.route("/test", methods=["POST"])
+def test():
+    if __name__ == '__main__':
+        async_booking.qq()
+    return "1"
