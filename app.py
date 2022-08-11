@@ -59,6 +59,6 @@ def get_cities(state_id):
 
 @app.route("/test", methods=["POST"])
 def test():
-    if __name__ == '__main__':
-        async_booking.qq()
+    print(__name__)
+    async_booking.qq()
     return "1"
