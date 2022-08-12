@@ -111,7 +111,7 @@ def main():
                     obj_resort = c[0]
                     obj_resort['Price_booking'] = None
                 else:
-                    bk_rooms = [k for k in bookHotels[c[1][0]]]
+                    bk_rooms = [k for k in bookHotels[c[1][0]] if k != 'url']
                     new_list = connect([c[0]], bk_rooms, 'Room')
                     obj_resort = new_list[0][0]
                     if len(new_list[0][1]) > 1:
