@@ -2,7 +2,8 @@ import requests
 import json
 from bs4 import BeautifulSoup
 import time
-from booking_parser import ParseBooking
+#from booking_parser import ParseBooking
+from async_booking import ParseBooking
 from connector import connect
 import traceback
 
@@ -96,7 +97,7 @@ def main():
             cur = 'EUR'
 
         ppl = pagelist.copy()
-        ppl.append({"ADULT": int(url_keys['ADULT']), "CHILD": int(url_keys['CHILD']), "AGES": url_keys['AGES'], 'CUR':cur})
+        ppl.append({"ADULT": int(url_keys['ADULT']), "CHILD": int(url_keys['CHILD']), "AGES": url_keys['AGES'], 'CUR':cur, 'NIGHTS': url_keys['NIGHTS_FROM'], 'DATE': url_keys['CHECKIN_BEG']})
 
         bookHotels = ParseBooking(ppl)
 
