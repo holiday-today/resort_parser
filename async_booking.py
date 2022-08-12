@@ -6,7 +6,7 @@ import datetime
 from fake_useragent import UserAgent
 import asyncio
 import aiohttp
-from multiprocessing import Process, freeze_support
+from multiprocessing import Process, freeze_support, Manager
 
 url_getid = 'https://accommodations.booking.com/autocomplete.json'
 cok = {
@@ -21,35 +21,6 @@ headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
     'user-agent': "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.106 Safari/537.36"
 }
-
-hotels_id = {}
-storage = {}
-
-query = ['Four Seasons Hotel Abu Dhabi at Al Maryah Island', 'Kingfisher Retreat',
-                'Royal Beach Hotel & Resort',
-                'Royal M hotel & Resort Fujairah',
-                'Saadiyat Rotana Resort & Villas',
-                'Sahara Beach Resort & Spa',
-                'Sandy Beach Hotel & Resort Fujairah',
-                'Shangri-La Hotel Qaryat Al Beri Abu Dhabi',
-                'Sharjah Carlton Hotel',
-                'Sharjah Palace Hotel',
-                'Sharjah Premiere Hotel & Resort',
-                'Sheraton Abu Dhabi Hotel and Resort',
-                'Sheraton Sharjah Beach Resort & Spa',
-                'Six Senses Zighy Bay',
-                'Sofitel Abu Dhabi Corniche',
-                'Southern Sun Hotel Abu Dhabi',
-                'Swiss-Belhotel Sharjah',
-                'Telal Resort AL Ain',
-                'The Abu Dhabi Edition',
-                'The Act Hotel',
-                'The Chedi Al Bait Sharjah',
-                'The Ritz Carlton Abu Dhabi Grand Canal',
-                'The St. Regis Abu Dhabi',
-                'The WB Abu Dhabi, Curio Collection By Hilton']
-
-limit = asyncio.Semaphore(10)
 
 async def get_page_data(session, page):
     cok['query'] = page.split('Guest House')[0]
@@ -79,9 +50,7 @@ async def get_page_data(session, page):
                                 break
                         if dest_id == 0:
                             print(f'Hotel {page} not found!')
-                            #hotels_id[page] = None
-                            return
-        hotels_id[page] = {'dest_id': dest_id}
+        return {page: dest_id}
 
 
 async def gather_data(data):
@@ -93,124 +62,206 @@ async def gather_data(data):
             task = asyncio.create_task(get_page_data(session, page))
             tasks.append(task)
 
-        await asyncio.gather(*tasks)
+        return await asyncio.gather(*tasks)
 
 #############################################################################
 
-async def get_hotel(session, hotel):
-    url_search = f'https://www.booking.com/searchresults.en-gb.html?dest_id={hotels_id[hotel]["dest_id"]}&dest_type=hotel&checkin={20221015}&checkout={20221020}&group_adults={2}&no_rooms=1&group_children={0}'
-    global limit
-    with await limit:
-        async with session.get(url_search, headers=headers) as response:
-            soup = BeautifulSoup(await response.text(), features="html.parser")
-            #with open(f'{hotel}.html', 'w', encoding='utf-8') as f:
-            #    f.write(response_text)
-            url_hotel = soup.select_one('.e13098a59f').get('href')
-            print(url_hotel)
-            hotels_id[hotel]['url'] = url_hotel
+# error возможна по limit
+
+async def get_hotel(session, hotel_name, hotel_id, dop_data):
+    url_search = f'https://www.booking.com/searchresults.en-gb.html?dest_id={hotel_id}&dest_type=hotel&checkin={str(dop_data[0])}&checkout={str(dop_data[1])}&group_adults={dop_data[2]}&no_rooms=1&group_children={dop_data[3]}'
+    for age in dop_data[4]:
+        url_search += f'&age={str(age)}'
+    async with session.get(url_search, headers=headers) as response:
+        print(f'{response.status}: {hotel_name}')
+        return {hotel_name: await response.text()}
 
 
-async def parse_hotels():
+async def parse_hotels(data, dop_data):
     async with aiohttp.ClientSession() as session:
-        
         tasks = []
 
-        for hotel in hotels_id:
-            task = asyncio.create_task(get_hotel(session, hotel))
+        for hotel in data:
+            hot_data = list(hotel.keys())[0]
+            task = asyncio.create_task(get_hotel(session, hot_data, hotel[hot_data], dop_data))
             tasks.append(task)
 
-        await asyncio.gather(*tasks)
+        return await asyncio.gather(*tasks)
 
 #############################################################################
 
-loc_data = [
-    'https://www.booking.com/hotel/om/six-senses-hideaway-zighy-bay.en-gb.html?aid=304142&ucfs=1&arphpl=1&dest_id=28922&dest_type=hotel&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=1&hapos=1&sr_order=popularity&srpvid=40417068b6410228&srepoch=1660147153&from_beach_sr=1&from_sustainable_property_sr=1&from=searchresults',
-    'https://www.booking.com/hotel/ae/the-ritz-carlton-abu-dhabi-grand-canal.en-gb.html?aid=304142&ucfs=1&arphpl=1&dest_id=474237&dest_type=hotel&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=1&hapos=1&sr_order=popularity&srpvid=a3377068f31508b6&srepoch=1660147153&from_sustainable_property_sr=1&from=searchresults',
-    'https://www.booking.com/hotel/ae/sofitel-abu-dhabi-corniche.en-gb.html?aid=304142&ucfs=1&arphpl=1&dest_id=292038&dest_type=hotel&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=1&hapos=1&sr_order=popularity&srpvid=42a370681b200230&srepoch=1660147153&from_sustainable_property_sr=1&from=searchresults',
-    'https://www.booking.com/hotel/ae/the-abu-dhabi-edition.en-gb.html?aid=304142&ucfs=1&arphpl=1&dest_id=4125129&dest_type=hotel&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=1&hapos=1&sr_order=popularity&srpvid=ea4e706865d102fe&srepoch=1660147153&from_sustainable_property_sr=1&from=searchresults',
-    'https://www.booking.com/hotel/ae/sheraton-sharjah-beach-resort-and-spa.en-gb.html?aid=304142&ucfs=1&arphpl=1&dest_id=1475859&dest_type=hotel&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=1&hapos=1&sr_order=popularity&srpvid=587370688a970143&srepoch=1660147154&from_sustainable_property_sr=1&from=searchresults',
-    'https://www.booking.com/hotel/ae/sharjah-palace.en-gb.html?aid=304142&ucfs=1&arphpl=1&dest_id=260010&dest_type=hotel&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=1&hapos=1&sr_order=popularity&srpvid=bb287068b69e0012&srepoch=1660147154&from_sustainable_property_sr=1&from=searchresults',
-    'https://www.booking.com/hotel/ae/telal-resort.en-gb.html?aid=304142&ucfs=1&arphpl=1&dest_id=1287536&dest_type=hotel&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=1&hapos=1&sr_order=popularity&srpvid=9bde7068463801fc&srepoch=1660147153&from=searchresults',
-    'https://www.booking.com/hotel/ae/sahara-beach-resort-amp-spa.en-gb.html?aid=304142&ucfs=1&arphpl=1&dest_id=3153157&dest_type=hotel&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=1&hapos=1&sr_order=popularity&srpvid=61bd7068ac6601a8&srepoch=1660147154&from=searchresults',
-    'https://www.booking.com/hotel/ae/saadiyat-rotana-resort-and-villas.en-gb.html?aid=304142&ucfs=1&arphpl=1&dest_id=2803703&dest_type=hotel&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=1&hapos=1&sr_order=popularity&srpvid=eb427068c10501d4&srepoch=1660147154&from_sustainable_property_sr=1&from=searchresults',
-    'https://www.booking.com/hotel/ae/sharjah-premiere-resort.en-gb.html?aid=304142&ucfs=1&arphpl=1&dest_id=72817&dest_type=hotel&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=1&hapos=1&sr_order=popularity&srpvid=1d527068cc2c00ab&srepoch=1660147154&from=searchresults',
-    'https://www.booking.com/hotel/ae/carlton-beach-sharjah.en-gb.html?aid=304142&ucfs=1&arphpl=1&dest_id=23243&dest_type=hotel&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=1&hapos=1&sr_order=popularity&srpvid=e7987068c62500a7&srepoch=1660147154&from=searchresults',
-    'https://www.booking.com/hotel/ae/sheraton-abu-dhabi-resort.en-gb.html?aid=304142&ucfs=1&arphpl=1&dest_id=67443&dest_type=hotel&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=1&hapos=1&sr_order=popularity&srpvid=73dd7068bbc60235&srepoch=1660147153&from_sustainable_property_sr=1&from=searchresults',
-    'https://www.booking.com/hotel/ae/the-wb-abu-dhabi-curio-collection-by-hilton.en-gb.html?aid=304142&ucfs=1&arphpl=1&dest_id=7859222&dest_type=hotel&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=1&hapos=1&sr_order=popularity&srpvid=0f1e7068196602c3&srepoch=1660147153&from_sustainable_property_sr=1&from=searchresults',
-    'https://www.booking.com/hotel/ae/royal-beach-resort.en-gb.html?aid=304142&ucfs=1&arphpl=1&dest_id=68263&dest_type=hotel&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=1&hapos=1&sr_order=popularity&srpvid=06a070682a5401a1&srepoch=1660147153&from_beach_sr=1&beach_sr_walking_distance=1591&from=searchresults',
-    'https://www.booking.com/hotel/ae/the-st-regis-saadiyat-island-abu-dhabi.en-gb.html?aid=304142&ucfs=1&arphpl=1&dest_id=321847&dest_type=hotel&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=1&hapos=1&sr_order=popularity&srpvid=34927068c5ea009d&srepoch=1660147153&from_sustainable_property_sr=1&from=searchresults',
-    'https://www.booking.com/hotel/ae/four-seasons-abu-dhabi-at-al-maryah-island.en-gb.html?aid=304142&ucfs=1&arphpl=1&dest_id=1690854&dest_type=hotel&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=1&hapos=1&sr_order=popularity&srpvid=54f87068549c03be&srepoch=1660147154&from=searchresults',
-    'https://www.booking.com/hotel/ae/royal-tulip-the-act.en-gb.html?aid=304142&ucfs=1&arphpl=1&dest_id=2009948&dest_type=hotel&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=1&hapos=1&sr_order=popularity&srpvid=cc3b706865d202df&srepoch=1660147153&from_sustainable_property_sr=1&from=searchresults',
-    'https://www.booking.com/hotel/ae/kingfisher-retreat.en-gb.html?aid=304142&ucfs=1&arphpl=1&dest_id=3308353&dest_type=hotel&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=1&hapos=1&sr_order=popularity&srpvid=ca5e70685ad900e5&srepoch=1660147153&from_sustainable_property_sr=1&from=searchresults',
-    'https://www.booking.com/hotel/ae/shangri-la-residence.en-gb.html?aid=304142&ucfs=1&arphpl=1&dest_id=492991&dest_type=hotel&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=1&hapos=1&sr_order=popularity&srpvid=525270686bef0263&srepoch=1660147154&from_sustainable_property_sr=1&from=searchresults',
-    'https://www.booking.com/hotel/ae/royal-m-and-resort-abu-dhabi-abu-dhabi.en-gb.html?aid=304142&ucfs=1&arphpl=1&dest_id=3999335&dest_type=hotel&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=1&hapos=1&sr_order=popularity&srpvid=2a777068974801af&srepoch=1660147154&from=searchresults',
-    'https://www.booking.com/hotel/ae/sandy-beach-resort.en-gb.html?aid=304142&ucfs=1&arphpl=1&dest_id=175711&dest_type=hotel&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=1&hapos=1&sr_order=popularity&srpvid=8e057068f24a00a6&srepoch=1660147153&from_beach_sr=1&beach_sr_walking_distance=515&from=searchresults',
-    'https://www.booking.com/hotel/ae/al-bait-sharjah-uae.en-gb.html?aid=304142&ucfs=1&arphpl=1&dest_id=3323556&dest_type=hotel&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=1&hapos=1&sr_order=popularity&srpvid=5fdb70689ccf0311&srepoch=1660147153&from_sustainable_property_sr=1&from=searchresults'
-]
-
-async def get_hotel_data(session, hotel):
-    async with session.get(hotel, headers=headers) as response2: #hotels_id[hotel]['url']
-        print(response2)
-        #soup = BeautifulSoup(await response2.text(), features="html.parser")
-        #rooms = soup.select('[class*="js-rt-block-row"]')
-        return await response2.text()
+async def get_hotel_data(session, hotel, hotelUrl, cur):
+    url_hotel = hotelUrl.split('&checkin=')
+    url_hotel = url_hotel[0] + '&selected_currency=' + cur + '&checkin=' + url_hotel[1]
+    if cur == 'RUB':
+        cur = 'RUB'
+    elif cur == 'EUR':
+        cur = '€'
+    async with session.get(url_hotel, headers=headers) as response:
+        print(f'{response.status}: {hotel}')
+        return [hotel, url_hotel, await response.text(), cur]
 
 
-async def parsw():
-        async with aiohttp.ClientSession() as session:
-            print('parsw')
-            tasks = []
+async def parsw(mylist, cur):
+    async with aiohttp.ClientSession() as session:
+        tasks = []
+        mylist = dict(mylist)
+        for hotel in mylist:
+            task = asyncio.create_task(get_hotel_data(session, hotel, mylist[hotel], cur))
+            tasks.append(task)
+
+        return await asyncio.gather(*tasks)
+
+#############################################################################
+nights = 0
+cnt_a = 0
+cnt_c = 0
+
+def main_parser(datalist, storage):
+    for el in datalist:
+        name_h = el[0]
+        url_h = el[1]
+        r = el[2]
+        cur = el[3]
     
-            for hotel in loc_data: #hotels_id
-                task = asyncio.create_task(get_hotel_data(session, hotel))
-                tasks.append(task)
+        soup = BeautifulSoup(r, features="html.parser")
+        rooms = soup.select('[class*="js-rt-block-row"]')
+        params = {}
+        currentRoom = ''
+        
+        for room in rooms:
+            if not room.select_one('.bui-u-sr-only'):
+                continue
     
-            return await asyncio.gather(*tasks)
+            if room.select_one('[class*="-first"]'):
+                currentRoom = room.select_one('.hprt-roomtype-icon-link').text.replace('\n', ' ')
+                
+                while not currentRoom[0].isalpha():
+                    currentRoom = currentRoom[1:]
+                while not currentRoom[-1].isalpha():
+                    currentRoom = currentRoom[:-1]
+    
+                RoomBed = ''
+                if 'double' in room.select_one('[class*="bed-types-wrapper"]').text:
+                    RoomBed = 'double'
+                else:
+                    RoomBed = 'single'
+    
+                params[currentRoom] = {'RoomBed': RoomBed, 'Types': []}
+    
+            if room.select_one('li[class="bui-list__item e2e-cancellation"]') or room.select_one('[class*="bui-f-color-destructive"]'):
+                continue
+    
+            sleeps = room.select('.bui-u-sr-only')[0].text.replace('\n', ' ').split(' ')
+            sleeps = [x for x in sleeps if x.isdigit()]
+            if len(sleeps) == 2:
+                sleeps = sleeps[0]+"+"+sleeps[1]
+            else:
+                sleeps = sleeps[0]
+    
+            price = {}
+            priceDefault = int(room.select_one('.prco-valign-middle-helper').text.replace('\n', ' ').split(cur)[-1][1:].replace(',', ''))
+            nalog = room.select_one('[class*="prd-taxes-and-fees-under-price"]').text.split(cur)
+            if len(nalog) == 2:
+                nalog = int(nalog[1].split(' ')[0][1:].replace(',', ''))
+                priceDefault += nalog
+    
+            meals = room.select_one('.bui-list__description').text.lower()
+            if 'all-inclusive' in meals:
+                price['All Inclusive'] = priceDefault
+            elif 'breakfast' in meals and 'dinner' in meals and 'lunch' in meals and 'included' in meals:
+                price['Full Board'] = priceDefault
+            elif 'breakfast' in meals and 'dinner' in meals and 'included' in meals:
+                price['Half Board'] = priceDefault
+            elif 'breakfast' in meals and 'included' in meals:
+                price['Bed Breakfast'] = priceDefault
+            else:
+                price['Без питания'] = priceDefault
+    
+            dopMeals = room.select_one(".bui-modal__header")
+            t = BeautifulSoup(str(dopMeals), features="html.parser")
+            t = t.select_one('p').text.split(cur)
+    
+            if len(t) > 1:
+                t_low = t[0].lower()
+                dopPrice = int(t[1].split(' ')[0][1:].replace(',', '')) * int(nights) * (int(cnt_a) + int(cnt_c))
+                if 'all-inclusive costs' in t_low or 'all inclusive costs' in t_low:
+                    price['|All Inclusive'] = priceDefault + dopPrice
+                elif 'full board costs' in t_low:
+                    price['|Full Board'] = priceDefault + dopPrice
+                elif 'half board costs' in t_low:
+                    price['|Half Board'] = priceDefault + dopPrice
+                elif 'breakfast costs' in t_low:
+                    price['|Bed Breakfast'] = priceDefault + dopPrice
+            params[currentRoom]['Types'].append({'Sleeps': sleeps, 'Price': price})
+        
+        params = {key:value for key, value in params.items() if value['Types'] != []}
+        params['url'] = url_h
+        storage[name_h] = params
+        print(f'{name_h} added!')
+        if params == {}:
+            print(f'{name_h} is empty!')
+
+    #with open('itog.json', 'w', encoding='utf-8') as f:
+    #    print('Wroten to file!')
+    #    json.dump(res_data, f, ensure_ascii=False, indent=4)
 
 
-def main():
-    print("Let's go!")
-    #asyncio.run(gather_data(query))
-    #print(time.time() - start_time)
-    #print(hotels_id)
-    #print("Start parse Hotels!")
-    #asyncio.run(parse_hotels())
-    #print(time.time() - start_time)
-    print("Start parse data!")
-    a = asyncio.run(parsw())
-    print(time.time() - start_time)
-    for i in a:
-        soup = BeautifulSoup(i, features="html.parser")
-        print(time.time() - start_time)
-    print(time.time() - start_time)
-
-#main()
-start_time = time.time()
-
-def my_function(a_el):
+def my_function(a_el, soups):
     for i in a_el:
-        print(len(i))
-        soup = BeautifulSoup(i, features="html.parser")
-        #print(time.time() - start_time)
+        soup = BeautifulSoup(list(i.values())[0], features="html.parser")
+        url_hotel = soup.select_one('.e13098a59f').get('href')
+        soups[list(i)[0]] = url_hotel
 
-def f(e):
-    print(e)
 
-def qq():
-    global start_time
-    print('q')
-    print(__name__)
-    freeze_support()
-    a = asyncio.run(parsw())
-    print(len(a))
-    start_time = time.time()
-    print(123)
-    #e = [BeautifulSoup(i, features="html.parser") for i in a]
-    p = Process(target=my_function, args=([a[:11]]))
-    g = Process(target=my_function, args=([a[11::]]))
-    print(time.time() - start_time)
-    g.start()
+def my_async(hh, func):
+    manager = Manager()
+    soups = manager.dict()
+    a = len(hh)//2
+    p = Process(target=func, args=([hh[:a], soups]))
+    g = Process(target=func, args=([hh[a:], soups]))
     p.start()
+    g.start()
     p.join()
     g.join()
-    print('Final time:', time.time() - start_time)
+    return soups
+
+#############################################################################
+
+def ParseBooking(data):
+    global soups
+    query = set([i["Name"] for i in data[:-1]])
+
+    nights = data[-1]['NIGHTS']
+
+    dt = data[-1]['DATE']
+    checkin = datetime.date(int(dt[:4]), int(dt[4:6]), int(dt[6:]))
+    checkout = checkin + datetime.timedelta(days=int(nights))
+
+    cnt_a = data[-1]['ADULT']
+    cnt_c = data[-1]['CHILD']
+
+    dop_data = [checkin, checkout, cnt_a, cnt_c, data[-1]["AGES"]]
+
+    print("Async booking parser start!")
+    hotels_names = asyncio.run(gather_data(query))
+
+    print("Parse Hotels...")
+    hotels_html = asyncio.run(parse_hotels(hotels_names, dop_data))
+    hhkeys = [{list(k.keys())[0]: list(k.values())[0]} for k in list(hotels_html)]
+    
+    print("Making soups...")
+    final_hot_urls = my_async(hhkeys, my_function)
+
+    print("Getting hotels urls...")
+    a = asyncio.run(parsw(final_hot_urls, data[-1]['CUR']))
+
+    print("Parse data...")
+    get_soups = dict(my_async(a, main_parser))
+    res_data = {key:value for key, value in get_soups.items() if len(value) > 1} # if value != {}
+    #with open('itog.json', 'w', encoding='utf-8') as f:
+    #    print('Wroten to file!')
+    #    json.dump(res_data, f, ensure_ascii=False, indent=4)
+    return res_data
+
+#############################################################################
