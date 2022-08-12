@@ -50,6 +50,7 @@ async def get_page_data(session, page):
                                 break
                         if dest_id == 0:
                             print(f'Hotel {page} not found!')
+                            return {}
         return {page: dest_id}
 
 
@@ -245,6 +246,7 @@ def ParseBooking(data):
 
     print("Async booking parser start!")
     hotels_names = asyncio.run(gather_data(query))
+    hotels_names = [i for i in hotels_names if i != {}]
 
     print("Parse Hotels...")
     hotels_html = asyncio.run(parse_hotels(hotels_names, dop_data))
