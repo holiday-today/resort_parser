@@ -54,13 +54,22 @@ def main():
                 continue
 
             h = {}
-            h['Name'] = i.select_one('.link-hotel').text.replace('\n', '')[2:].split('(')[-2]
+            h['Name'] = i.select_one('.link-hotel').text.replace('\n', '')[2:]
+            tmp_h = ''
             if '*' in h['Name']:
-                h['Name'] = h['Name'].split('*')[0][:-2]
+                tmp_h += h['Name'][h['Name'].index('*')-1:]
+                h['Name'] = h['Name'][:h['Name'].index('*')-1]
+            elif 'Guest House' in h['Name']:
+                tmp_h += h['Name'][h['Name'].index('Guest House'):]
+                h['Name'] = h['Name'][:h['Name'].index('Guest House')]
+            if '(' in h['Name']:
+                tmp_h += h['Name'][h['Name'].index('('):]
+                h['Name'] = h['Name'][:h['Name'].index('(')]
             while not h['Name'][0].isalpha():
                 h['Name'] = h['Name'][1:]
             while not h['Name'][-1].isalpha():
                 h['Name'] = h['Name'][:-1]
+            h['tmp'] = tmp_h
 
             h['Date'] = i.select_one('.sortie').text.replace('\n', '')
             h['Nights'] = i.select_one('.c').text.replace('\n', '')
@@ -134,11 +143,14 @@ def main():
                         obj_resort['booking_room_name'] = new_list[0][1][0]
                     else:
                         obj_resort['Price_booking'] = None
+                obj_resort['Name'] = obj_resort['Name']+' '+obj_resort['tmp']
+                obj_resort.pop('tmp')
+                obj_resort['url_booking'] = bookHotels[c[1][0]]['url']
                 itog_page.append(obj_resort)
                 #print('################################')Price
         result_json[url_keys['PRICEPAGE']] = itog_page
-        with open('data.json', 'w', encoding='utf-8') as f:
-            json.dump(result_json, f, ensure_ascii=False, indent=4)
+        #with open('data.json', 'w', encoding='utf-8') as f:
+        #    json.dump(result_json, f, ensure_ascii=False, indent=4)
         print('\n##################\nPage', (url_keys['PRICEPAGE']), 'is loaded!\n##################\n')
 
         if soup.select_one('.pager'):
