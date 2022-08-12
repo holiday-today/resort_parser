@@ -153,11 +153,12 @@ def ParseBooking(data):
 
             params = {key:value for key, value in params.items() if value['Types'] != []}
             storage[s] = params
+            storage[s]['url'] = url_hotel
             print(f'{s} added!')
             if params == {}:
                 print(f'{s} is empty!')
 
-    res_data = {key:value for key, value in storage.items() if value != {}}
+    res_data = {key:value for key, value in storage.items() if len(value) > 1}
 
     with open('itog.json', 'w', encoding='utf-8') as f:
         print('Wroten to file!')
