@@ -10,15 +10,15 @@ def chng(x):
 	if 'one' in x.lower():
 		return x.replace('One', '1').replace('one', '1')
 	elif 'two' in x.lower():
-		return x.replace('Two', '1').replace('two', '1')
+		return x.replace('Two', '2').replace('two', '2')
 	elif 'three' in x.lower():
-		return x.replace('Three', '1').replace('three', '1')
+		return x.replace('Three', '3').replace('three', '3')
 	elif 'four' in x.lower():
-		return x.replace('Four', '1').replace('four', '1')
+		return x.replace('Four', '4').replace('four', '4')
 	elif 'five' in x.lower():
-		return x.replace('Five', '1').replace('five', '1')
+		return x.replace('Five', '5').replace('five', '5')
 	elif 'six' in x.lower():
-		return x.replace('Six', '1').replace('six', '1')
+		return x.replace('Six', '6').replace('six', '6')
 	else:
 		return x
 	#return x.replace('One', '1').replace('one', '1').replace('Two', '2').replace('two', '2').replace('Three', '3').replace('three', '3').replace('Four', '4').replace('four', '4').replace('Five', '5').replace('five', '5')
