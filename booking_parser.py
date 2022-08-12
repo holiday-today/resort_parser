@@ -25,9 +25,7 @@ def ParseBooking(data):
     for el in data[:-1]:
         dt_id += 1
         print(f'{dt_id}/{ld}', end=' ')
-        s = el['Name'].split('Guest House')[0]
-        if s[0] == ' ':
-            s = s[1:]
+        s = el['Name']
         if s in storage:
             print(s, "in storage!")
         else:
@@ -77,7 +75,6 @@ def ParseBooking(data):
             url_hotel = soup.select_one('.e13098a59f').get('href')
             url_hotel = url_hotel.split('&checkin=')
             url_hotel = url_hotel[0] + '&selected_currency=' + data[-1]['CUR'] + '&checkin=' + url_hotel[1]
-            print(url_hotel)
             r = requests.get(url_hotel, headers=headers)
             
             soup = BeautifulSoup(r.text, features="html.parser")
