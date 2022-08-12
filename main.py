@@ -160,6 +160,13 @@ def main():
 def start(server_data):
     global url_keys
     print('main parser start')
+    strs_tmp = []
+    if '4' in server_data['STARS']:
+        strs_tmp.append('3')
+    if '5' in server_data['STARS']:
+        strs_tmp.append('2')
+    if '6' in server_data['STARS']:
+        strs_tmp.append('7')
     url_keys = {
         'STATEINC': server_data['STATEINC'],           
         'CHECKIN_BEG': server_data['CHECKIN_BEG'],  
@@ -173,7 +180,7 @@ def start(server_data):
         'TOWNS': server_data['TOWNS'],
         'HOTELS': server_data['HOTELS'],
         'MEALS': server_data['MEALS'],
-        'STARS': server_data['STARS'],
+        'STARS': strs_tmp,
         'FILTER': '1',              
         'PRICEPAGE': 1,             
         'DOLOAD': 1                 
