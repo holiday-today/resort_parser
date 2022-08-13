@@ -149,6 +149,8 @@ def main():
                 obj_resort['Name'] = obj_resort['Name']+' '+obj_resort['tmp']
                 obj_resort.pop('tmp')
                 itog_page.append(obj_resort)
+        else:
+            itog_page = pagelist
                 #print('################################')Price
         result_json[url_keys['PRICEPAGE']] = itog_page
         #with open('data.json', 'w', encoding='utf-8') as f:
