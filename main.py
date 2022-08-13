@@ -107,7 +107,7 @@ def main():
         if len(bk) != 0:
             hotel_table = connect(pagelist, bk, 'Name')
             for c in hotel_table:
-                if bookHotels[c[1][0]] == None:
+                if not c[1][0] in bookHotels:
                     obj_resort = c[0]
                     obj_resort['Price_booking'] = None
                 else:
@@ -144,9 +144,10 @@ def main():
                         obj_resort['booking_room_name'] = new_list[0][1][0]
                     else:
                         obj_resort['Price_booking'] = None
+                    if obj_resort['Name'] == c[1][0]:
+                        obj_resort['url_booking'] = bookHotels[c[1][0]]['url']
                 obj_resort['Name'] = obj_resort['Name']+' '+obj_resort['tmp']
                 obj_resort.pop('tmp')
-                obj_resort['url_booking'] = bookHotels[c[1][0]]['url']
                 itog_page.append(obj_resort)
                 #print('################################')Price
         result_json[url_keys['PRICEPAGE']] = itog_page
