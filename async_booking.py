@@ -260,7 +260,7 @@ def ParseBooking(data):
 
     print("Parse data...")
     get_soups = dict(my_async(a, main_parser))
-    res_data = {key:value for key, value in get_soups.items() if len(value) > 1} # if value != {}
+    res_data = {key:value for key, value in get_soups.items() if len(value) > 0} # if value != {}
     #with open('itog.json', 'w', encoding='utf-8') as f:
     #    print('Wroten to file!')
     #    json.dump(res_data, f, ensure_ascii=False, indent=4)
