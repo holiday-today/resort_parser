@@ -218,13 +218,19 @@ def my_function(a_el, soups):
 def my_async(hh, func):
     manager = Manager()
     soups = manager.dict()
-    a = len(hh)//2
+    a = len(hh)//4
     p = Process(target=func, args=([hh[:a], soups]))
-    g = Process(target=func, args=([hh[a:], soups]))
+    g = Process(target=func, args=([hh[a:(2*a)], soups]))
+    e = Process(target=func, args=([hh[(2*a):(3*a)], soups]))
+    w = Process(target=func, args=([hh[(3*a):], soups]))
     p.start()
     g.start()
+    e.start()
+    w.start()
     p.join()
     g.join()
+    e.join()
+    w.join()
     return soups
 
 #############################################################################
