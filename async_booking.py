@@ -228,7 +228,7 @@ def my_async(hh, func):
     tt = time.time()
 
     lh = len(hh)
-    p = 4   # Количество потоков
+    p = 6   # Количество потоков
 
     b = []
     for i in range(0, lh, lh//p):
@@ -275,9 +275,9 @@ def ParseBooking(data):
     print("Parse data...")
     get_soups = dict(my_async(a, main_parser))
     res_data = {key:value for key, value in get_soups.items() if len(value) > 0} # if value != {}
-    with open('itog.json', 'w', encoding='utf-8') as f:
-        print('Wroten to file!')
-        json.dump(res_data, f, ensure_ascii=False, indent=4)
+    #with open('itog.json', 'w', encoding='utf-8') as f:
+    #    print('Wroten to file!')
+    #    json.dump(res_data, f, ensure_ascii=False, indent=4)
     return res_data
 
 #############################################################################
