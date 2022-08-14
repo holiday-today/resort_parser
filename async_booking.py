@@ -123,7 +123,7 @@ nights = 0
 cnt_a = 0
 cnt_c = 0
 
-def main_parser(datalist, storage):
+def main_parser(datalist, storage, tt):
     for el in datalist:
         name_h = el[0]
         url_h = el[1]
@@ -207,6 +207,7 @@ def main_parser(datalist, storage):
         print(f'{name_h} added!')
         if params == {}:
             print(f'{name_h} is empty!')
+        print(time.time()-tt)
 
     #with open('itog.json', 'w', encoding='utf-8') as f:
     #    print('Wroten to file!')
