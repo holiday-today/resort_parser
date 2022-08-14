@@ -230,7 +230,7 @@ def my_async(hh, func):
     b = []
 
     for i in range(0, lh//2, lh//p):
-        b.append(Process(target=func, args=([hh[i:min(i+lh//p, lh//2)], soups, tt])))
+        b.append(Process(target=func, args=([hh[i:min(i+lh//p, lh//2)], soups])))
     for i in b:
         i.start()
     for i in b:
@@ -239,7 +239,7 @@ def my_async(hh, func):
     b = []
     print('1/2:', time.time()-tt)
     for i in range(lh//2, lh, lh//p):
-        b.append(Process(target=func, args=([hh[i:min(i+lh//p, lh)], soups, tt])))
+        b.append(Process(target=func, args=([hh[i:min(i+lh//p, lh)], soups])))
     for i in b:
         i.start()
     for i in b:
