@@ -226,11 +226,18 @@ def my_async(hh, func):
     tt = time.time()
 
     lh = len(hh)
-    p = 6   # Количество потоков
-
+    p = 8   # Количество потоков
     b = []
-    for i in range(0, lh, lh//p):
-        b.append(Process(target=func, args=([hh[i:min(i+lh//p, lh)], soups])))
+
+    for i in range(0, lh//2, lh//p):
+        b.append(Process(target=func, args=([hh[i:min(i+lh//p, lh//2)], soups, tt])))
+    for i in b:
+        i.start()
+    for i in b:
+        i.join()
+
+    for i in range(lh//2, lh, lh//p):
+        b.append(Process(target=func, args=([hh[i:min(i+lh//p, lh)], soups, tt])))
     for i in b:
         i.start()
     for i in b:
