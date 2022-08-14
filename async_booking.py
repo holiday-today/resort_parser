@@ -123,7 +123,7 @@ nights = 0
 cnt_a = 0
 cnt_c = 0
 
-def main_parser(datalist, storage, tt):
+def main_parser(datalist, storage):
     for el in datalist:
         name_h = el[0]
         url_h = el[1]
@@ -207,19 +207,17 @@ def main_parser(datalist, storage, tt):
         print(f'{name_h} added!')
         if params == {}:
             print(f'{name_h} is empty!')
-        print(time.time()-tt)
 
     #with open('itog.json', 'w', encoding='utf-8') as f:
     #    print('Wroten to file!')
     #    json.dump(res_data, f, ensure_ascii=False, indent=4)
 
 
-def my_function(a_el, soups, tt):
+def my_function(a_el, soups):
     for i in a_el:
         soup = BeautifulSoup(list(i.values())[0], features="html.parser")
         url_hotel = soup.select_one('a.e13098a59f').get('href')
         soups[list(i)[0]] = url_hotel
-        print(time.time()-tt)
 
 
 def my_async(hh, func):
@@ -232,11 +230,12 @@ def my_async(hh, func):
 
     b = []
     for i in range(0, lh, lh//p):
-        b.append(Process(target=func, args=([hh[i:min(i+lh//p, lh)], soups, tt])))
+        b.append(Process(target=func, args=([hh[i:min(i+lh//p, lh)], soups])))
     for i in b:
         i.start()
     for i in b:
         i.join()
+    
     print('Fin:', time.time()-tt)
 
     return soups
