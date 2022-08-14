@@ -80,7 +80,10 @@ def main():
             h['Room'] = room_text[0]
             h['Sleeps'] = room_text[1].split('(')[0].split(' ')[0]
             
-            h['Price_resort'] = int(i.select_one('.td_price').text.replace('\n', '').split(' ')[0])
+            tmp_p = i.select_one('.td_price').text
+            while not tmp_p[0].isdigit():
+                tmp_p = tmp_p[1:]
+            h['Price_resort'] = int(tmp_p.split(' ')[0])
             
             pagelist.append(h)
     except:
