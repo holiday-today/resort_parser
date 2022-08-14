@@ -19,12 +19,11 @@ cok = {
 headers = {
     'Content-type': 'text/html; charset=UTF-8', 
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-    'user-agent': "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.106 Safari/537.36"
+    "User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36"
 }
 
-async def get_page_data(session, page):
-    cok['query'] = page.split('Guest House')[0]
-
+async def get_page_data(session, page, dop_data):
+    cok['query'] = page
     async with session.post(url_getid, json=cok) as response:
         get_json = await response.json()
         dest_id = 0
@@ -51,43 +50,49 @@ async def get_page_data(session, page):
                         if dest_id == 0:
                             print(f'Hotel {page} not found!')
                             return {}
-        return {page: dest_id}
+        url_search = f'https://www.booking.com/searchresults.en-gb.html?dest_id={dest_id}&dest_type=hotel&checkin={str(dop_data[0])}&checkout={str(dop_data[1])}&group_adults={dop_data[2]}&no_rooms=1&group_children={dop_data[3]}'
+        for age in dop_data[4]:
+            url_search += f'&age={str(age)}'
+        async with session.get(url_search, headers=headers) as response2:
+            print(f'{response2.status}: {page}')
+            if response2.status == 200:
+                return {page: await response2.text()}
 
 
-async def gather_data(data):
+async def gather_data(data, dop):
     async with aiohttp.ClientSession() as session:
         
         tasks = []
 
         for page in data:
-            task = asyncio.create_task(get_page_data(session, page))
+            task = asyncio.create_task(get_page_data(session, page, dop))
             tasks.append(task)
 
         return await asyncio.gather(*tasks)
 
 #############################################################################
 
-# error возможна по limit
+# # error возможна по limit
 
-async def get_hotel(session, hotel_name, hotel_id, dop_data):
-    url_search = f'https://www.booking.com/searchresults.en-gb.html?dest_id={hotel_id}&dest_type=hotel&checkin={str(dop_data[0])}&checkout={str(dop_data[1])}&group_adults={dop_data[2]}&no_rooms=1&group_children={dop_data[3]}'
-    for age in dop_data[4]:
-        url_search += f'&age={str(age)}'
-    async with session.get(url_search, headers=headers) as response:
-        print(f'{response.status}: {hotel_name}')
-        return {hotel_name: await response.text()}
+# async def get_hotel(session, hotel_name, hotel_id, dop_data):
+#     url_search = f'https://www.booking.com/searchresults.en-gb.html?dest_id={hotel_id}&dest_type=hotel&checkin={str(dop_data[0])}&checkout={str(dop_data[1])}&group_adults={dop_data[2]}&no_rooms=1&group_children={dop_data[3]}'
+#     for age in dop_data[4]:
+#         url_search += f'&age={str(age)}'
+#     async with session.get(url_search, headers=headers) as response:
+#         print(f'{response.status}: {hotel_name}')
+#         return {hotel_name: await response.text()}
 
 
-async def parse_hotels(data, dop_data):
-    async with aiohttp.ClientSession() as session:
-        tasks = []
+# async def parse_hotels(data, dop_data):
+#     async with aiohttp.ClientSession() as session:
+#         tasks = []
 
-        for hotel in data:
-            hot_data = list(hotel.keys())[0]
-            task = asyncio.create_task(get_hotel(session, hot_data, hotel[hot_data], dop_data))
-            tasks.append(task)
+#         for hotel in data:
+#             hot_data = list(hotel.keys())[0]
+#             task = asyncio.create_task(get_hotel(session, hot_data, hotel[hot_data], dop_data))
+#             tasks.append(task)
 
-        return await asyncio.gather(*tasks)
+#         return await asyncio.gather(*tasks)
 
 #############################################################################
 
@@ -208,29 +213,31 @@ def main_parser(datalist, storage):
     #    json.dump(res_data, f, ensure_ascii=False, indent=4)
 
 
-def my_function(a_el, soups):
+def my_function(a_el, soups, tt):
     for i in a_el:
         soup = BeautifulSoup(list(i.values())[0], features="html.parser")
-        url_hotel = soup.select_one('.e13098a59f').get('href')
+        url_hotel = soup.select_one('a.e13098a59f').get('href')
         soups[list(i)[0]] = url_hotel
+        print(time.time()-tt)
 
 
 def my_async(hh, func):
     manager = Manager()
     soups = manager.dict()
-    a = len(hh)//4
-    p1 = Process(target=func, args=([hh[:a], soups]))
-    p2 = Process(target=func, args=([hh[a:(2*a)], soups]))
-    p3 = Process(target=func, args=([hh[(2*a):(3*a)], soups]))
-    p4 = Process(target=func, args=([hh[(3*a):], soups]))
-    p1.start()
-    p2.start()
-    p3.start()
-    p4.start()
-    p1.join()
-    p2.join()
-    p3.join()
-    p4.join()
+    tt = time.time()
+
+    lh = len(hh)
+    p = 4   # Количество потоков
+
+    b = []
+    for i in range(0, lh, lh//p):
+        b.append(Process(target=func, args=([hh[i:min(i+lh//p, lh)], soups, tt])))
+    for i in b:
+        i.start()
+    for i in b:
+        i.join()
+    print('Fin:', time.time()-tt)
+
     return soups
 
 #############################################################################
@@ -251,12 +258,12 @@ def ParseBooking(data):
     dop_data = [checkin, checkout, cnt_a, cnt_c, data[-1]["AGES"]]
 
     print("Async booking parser start!")
-    hotels_names = asyncio.run(gather_data(query))
+    hotels_names = asyncio.run(gather_data(query, dop_data))
     hotels_names = [i for i in hotels_names if i != {}]
 
     print("Parse Hotels...")
-    hotels_html = asyncio.run(parse_hotels(hotels_names, dop_data))
-    hhkeys = [{list(k.keys())[0]: list(k.values())[0]} for k in list(hotels_html)]
+    #hotels_html = asyncio.run(parse_hotels(hotels_names, dop_data))
+    hhkeys = [{list(k.keys())[0]: list(k.values())[0]} for k in list(hotels_names)]
     
     print("Making soups...")
     final_hot_urls = my_async(hhkeys, my_function)
@@ -267,9 +274,9 @@ def ParseBooking(data):
     print("Parse data...")
     get_soups = dict(my_async(a, main_parser))
     res_data = {key:value for key, value in get_soups.items() if len(value) > 0} # if value != {}
-    #with open('itog.json', 'w', encoding='utf-8') as f:
-    #    print('Wroten to file!')
-    #    json.dump(res_data, f, ensure_ascii=False, indent=4)
+    with open('itog.json', 'w', encoding='utf-8') as f:
+        print('Wroten to file!')
+        json.dump(res_data, f, ensure_ascii=False, indent=4)
     return res_data
 
 #############################################################################
