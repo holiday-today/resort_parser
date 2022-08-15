@@ -1,5 +1,5 @@
 from flask import Flask, request, json
-import main
+import startResort
 import logging
 from flask_cors import CORS
 import parse_resort_states
@@ -47,7 +47,7 @@ def get_full_response():
         return 'Bad response json :('
     print('we have json!')
     print(f)
-    return main.start(to_main_json(f))
+    return startResort.start(to_main_json(f))
 
 @app.route("/state", methods=["GET"])
 def get_states():
