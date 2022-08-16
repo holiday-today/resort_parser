@@ -59,6 +59,6 @@ def get_cities(state_id):
 
 @app.route("/test", methods=["POST"])
 def test():
-    print(__name__)
-    async_booking.qq()
-    return "1"
+    with open('itog.json', encoding='utf-8') as f:
+        bookHotels = json.load(f)
+    return bookHotels
