@@ -245,7 +245,7 @@ def my_async(hh, func, tt=0):
     soups = manager.dict()
 
     lh = len(hh)
-    p = 4   # Количество потоков
+    p = min(4, lh)   # Количество потоков
     b = []
 
     for i in range(0, lh//2, lh//p):
