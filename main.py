@@ -104,6 +104,8 @@ def main():
 
         bookHotels = ParseBooking(ppl)
 
+        resSleeps = str(int(url_keys['ADULT']) + int(url_keys['CHILD']))
+        
         itog_page = []
         
         bk = [k for k in bookHotels]
@@ -123,7 +125,7 @@ def main():
                         for z in range(len(zzz)):
                             hs = False
                             for bzt in bookHotels[c[1][0]][zzz[tmp_hotel]]['Types']:
-                                if bzt['Sleeps'] == obj_resort['Sleeps']:
+                                if bzt['Sleeps'] == resSleeps:
                                     hs = True
                                     break
                             if not hs:
@@ -134,7 +136,7 @@ def main():
                             new_list[0][1] = []
                     if new_list[0][1] != []:
                         obj_booking = bookHotels[c[1][0]][new_list[0][1][0]]['Types']
-                        obj_book_price = [x['Price'] for x in obj_booking if x['Sleeps'] == obj_resort['Sleeps']]
+                        obj_book_price = [x['Price'] for x in obj_booking if x['Sleeps'] == resSleeps]
                         for obj_pr in obj_book_price:
                             if obj_resort['Food'] in obj_pr:
                                 obj_resort['Price_booking'] = obj_pr[obj_resort['Food']]
@@ -156,8 +158,7 @@ def main():
             itog_page = pagelist
                 #print('################################')Price
         result_json[url_keys['PRICEPAGE']] = itog_page
-        #with open('data.json', 'w', encoding='utf-8') as f:
-        #    json.dump(result_json, f, ensure_ascii=False, indent=4)
+        
         print('\n##################\nPage', (url_keys['PRICEPAGE']), 'is loaded!\n##################\n')
 
         if soup.select_one('.pager'):
@@ -169,7 +170,10 @@ def main():
         else:
             print('Last page loaded!')
             result_json[url_keys['PRICEPAGE']].append({'LastPage': True})
-        
+            
+        with open('data.json', 'w', encoding='utf-8') as f:
+            json.dump(result_json, f, ensure_ascii=False, indent=4)
+            
         return result_json
     except Exception as e:
         print('Something wrong! Try again...')
