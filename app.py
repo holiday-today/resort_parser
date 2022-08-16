@@ -57,8 +57,8 @@ def get_states():
 def get_cities(state_id):
     return parse_resort_states.start(state_id)
 
-@app.route("/test", methods=["POST"])
+@app.route("/test", methods=["GET"])
 def test():
-    with open('itog.json', encoding='utf-8') as f:
+    with open('data.json', encoding='utf-8') as f:
         bookHotels = json.load(f)
     return bookHotels
