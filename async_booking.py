@@ -14,7 +14,7 @@ cok = {
     "pageview_id": "f3ae6db9c405036b",
     "aid": 304142,
     "language": "ru",
-    "size": 5
+    "size": 3
 }
 headers = {
     'Content-type': 'text/html; charset=UTF-8', 
@@ -53,7 +53,7 @@ async def get_page_data(session, page, dop_data):
         url_search = f'https://www.booking.com/searchresults.en-gb.html?dest_id={dest_id}&dest_type=hotel&checkin={str(dop_data[0])}&checkout={str(dop_data[1])}&group_adults={dop_data[2]}&no_rooms=1&group_children={dop_data[3]}'
         for age in dop_data[4]:
             url_search += f'&age={str(age)}'
-        async with session.get(url_search, headers=headers) as response2:
+        async with session.get(url_search, headers=headers, timeout=10) as response2:
             print(f'{response2.status}: {page}')
             if response2.status == 200:
                 return {page: await response2.text()}
@@ -103,9 +103,14 @@ async def get_hotel_data(session, hotel, hotelUrl, cur):
         cur = 'RUB'
     elif cur == 'EUR':
         cur = '€'
-    async with session.get(url_hotel, headers=headers) as response:
-        print(f'{response.status}: {hotel}')
-        return [hotel, url_hotel, await response.text(), cur]
+    try:
+        async with session.get(url_hotel, headers=headers, timeout=10) as response:
+            print(f'{response.status}: {hotel}')
+            if response.status == 200:
+                return [hotel, url_hotel, await response.text(), cur]
+    except asyncio.TimeoutError:
+        print(f'TimeOut: {hotel}')
+        return []
 
 
 async def parsw(mylist, cur):
@@ -119,11 +124,11 @@ async def parsw(mylist, cur):
         return await asyncio.gather(*tasks)
 
 #############################################################################
-nights = 0
-cnt_a = 0
-cnt_c = 0
 
-def main_parser(datalist, storage):
+def main_parser(datalist, storage, tt):
+    nights = tt[0]
+    cnt_a = tt[1]
+    cnt_c = tt[2]
     for el in datalist:
         name_h = el[0]
         url_h = el[1]
@@ -155,9 +160,6 @@ def main_parser(datalist, storage):
     
                 params[currentRoom] = {'RoomBed': RoomBed, 'Types': []}
     
-            if room.select_one('li[class="bui-list__item e2e-cancellation"]') or room.select_one('[class*="bui-f-color-destructive"]'):
-                continue
-    
             sleeps = room.select('.bui-u-sr-only')[0].text.replace('\n', ' ').split(' ')
             sleeps = [x for x in sleeps if x.isdigit()]
             if len(sleeps) == 2:
@@ -174,15 +176,15 @@ def main_parser(datalist, storage):
     
             meals = room.select_one('.bui-list__description').text.lower()
             if 'all-inclusive' in meals:
-                price['All Inclusive'] = priceDefault
+                price['All Inclusive'] = str(priceDefault)
             elif 'breakfast' in meals and 'dinner' in meals and 'lunch' in meals and 'included' in meals:
-                price['Full Board'] = priceDefault
+                price['Full Board'] = str(priceDefault)
             elif 'breakfast' in meals and 'dinner' in meals and 'included' in meals:
-                price['Half Board'] = priceDefault
+                price['Half Board'] = str(priceDefault)
             elif 'breakfast' in meals and 'included' in meals:
-                price['Bed Breakfast'] = priceDefault
+                price['Bed Breakfast'] = str(priceDefault)
             else:
-                price['Без питания'] = priceDefault
+                price['Без питания'] = str(priceDefault)
     
             dopMeals = room.select_one(".bui-modal__header")
             t = BeautifulSoup(str(dopMeals), features="html.parser")
@@ -192,89 +194,80 @@ def main_parser(datalist, storage):
                 t_low = t[0].lower()
                 dopPrice = int(t[1].split(' ')[0][1:].replace(',', '')) * int(nights) * (int(cnt_a) + int(cnt_c))
                 if 'all-inclusive costs' in t_low or 'all inclusive costs' in t_low:
-                    price['|All Inclusive'] = priceDefault + dopPrice
+                    price['|All Inclusive'] = str(priceDefault + dopPrice)
                 elif 'full board costs' in t_low:
-                    price['|Full Board'] = priceDefault + dopPrice
+                    price['|Full Board'] = str(priceDefault + dopPrice)
                 elif 'half board costs' in t_low:
-                    price['|Half Board'] = priceDefault + dopPrice
+                    price['|Half Board'] = str(priceDefault + dopPrice)
                 elif 'breakfast costs' in t_low:
-                    price['|Bed Breakfast'] = priceDefault + dopPrice
-            params[currentRoom]['Types'].append({'Sleeps': sleeps, 'Price': price})
+                    price['|Bed Breakfast'] = str(priceDefault + dopPrice)
+
+            types = {'Sleeps': sleeps, 'Price': price}
+
+            #print(price)
+
+            types['Refund'] = room.select_one('li[class*="e2e-cancellation"]').select_one('.bui-list__description').text.replace('\n', ' ')
+
+            if room.select_one('[class*="bui-f-color-destructive"]'):
+                types['Discount'] = int(room.select_one('[class*="bui-f-color-destructive"]').text.replace('\n', ' ').split(cur)[-1][1:].replace(',', '')) - priceDefault
+
+            for meal_el in types['Price']:
+                types['Price'][meal_el] += f' ({types["Refund"]})'
+
+            for elem in params[currentRoom]['Types']:
+                if types['Sleeps'] == elem['Sleeps']:
+                    for k in elem['Price']:
+                        if k in types['Price']:
+                            elem['Price'][k] += f' \n{types["Price"][k]}'
+                            types["Price"].pop(k)
+
+            if types["Price"] != {}:
+                params[currentRoom]['Types'].append(types)
         
         params = {key:value for key, value in params.items() if value['Types'] != []}
         params['url'] = url_h
-        storage[name_h] = params
-        print(f'{name_h} added!')
+        storage[name_h] = params # RecursionError: maximum recursion depth exceeded while pickling an object
+        print(f'"{name_h}" added!')
         if params == {}:
-            print(f'{name_h} is empty!')
-
-    #with open('itog.json', 'w', encoding='utf-8') as f:
-    #    print('Wroten to file!')
-    #    json.dump(res_data, f, ensure_ascii=False, indent=4)
+            print(f'"{name_h}" is empty!')
 
 
-def my_function(a_el, soups):
+def my_function(a_el, soups, tt):
     for i in a_el:
         soup = BeautifulSoup(list(i.values())[0], features="html.parser")
         url_hotel = soup.select_one('a.e13098a59f').get('href')
         soups[list(i)[0]] = url_hotel
+        print(f'"{list(i)[0]}" url got!')
 
 
-def my_async(hh, func):
+def my_async(hh, func, tt=0):
     manager = Manager()
     soups = manager.dict()
-    tt = time.time()
 
     lh = len(hh)
-    p = 8   # Количество потоков
-    shag = lh//4
+    p = 4   # Количество потоков
     b = []
 
-    for i in range(0, shag, lh//p):
-        b.append(Process(target=func, args=([hh[i:min(i+lh//p, shag)], soups])))
+    for i in range(0, lh//2, lh//p):
+        b.append(Process(target=func, args=([hh[i:min(i+lh//p, lh//2)], soups, tt])))
     for i in b:
         i.start()
     for i in b:
         i.join()
-        
+
     b = []
-    print('1/4:', time.time()-tt)
-    
-    for i in range(shag, 2*shag, lh//p):
-        b.append(Process(target=func, args=([hh[i:min(i+lh//p, 2*shag)], soups])))
+    for i in range(lh//2, lh, lh//p):
+        b.append(Process(target=func, args=([hh[i:min(i+lh//p, lh)], soups, tt])))
     for i in b:
         i.start()
     for i in b:
         i.join()
-    
-    print('2/4:', time.time()-tt)
-    b = []
-    
-    for i in range(2*shag, 3*shag, lh//p):
-        b.append(Process(target=func, args=([hh[i:min(i+lh//p, 3*shag)], soups])))
-    for i in b:
-        i.start()
-    for i in b:
-        i.join()
-    
-    print('3/4:', time.time()-tt)
-    b = []
-    
-    for i in range(3*shag, lh, lh//p):
-        b.append(Process(target=func, args=([hh[i:min(i+lh//p, lh)], soups])))
-    for i in b:
-        i.start()
-    for i in b:
-        i.join()
-    
-    print('4/4:', time.time()-tt)
 
     return soups
 
 #############################################################################
 
 def ParseBooking(data):
-    global soups
     query = set([i["Name"] for i in data[:-1]])
 
     nights = data[-1]['NIGHTS']
@@ -301,9 +294,10 @@ def ParseBooking(data):
 
     print("Getting hotels urls...")
     a = asyncio.run(parsw(final_hot_urls, data[-1]['CUR']))
+    a = [x for x in a if x != []]
 
     print("Parse data...")
-    get_soups = dict(my_async(a, main_parser))
+    get_soups = dict(my_async(a, main_parser, [nights, cnt_a, cnt_c]))
     res_data = {key:value for key, value in get_soups.items() if len(value) > 0} # if value != {}
     #with open('itog.json', 'w', encoding='utf-8') as f:
     #    print('Wroten to file!')
