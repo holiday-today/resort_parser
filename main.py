@@ -149,7 +149,7 @@ def main():
                         obj_resort['booking_room_name'] = new_list[0][1][0]
                     else:
                         obj_resort['Price_booking'] = None
-                    if obj_resort['Name'] == c[1][0]:
+                    if obj_resort['Name'] == c[1][0] and 'url' in bookHotels[c[1][0]]:
                         obj_resort['url_booking'] = bookHotels[c[1][0]]['url']
                 obj_resort['Name'] = obj_resort['Name']+' '+obj_resort['tmp']
                 obj_resort.pop('tmp')
@@ -173,6 +173,7 @@ def main():
             
         with open('data.json', 'w', encoding='utf-8') as f:
             json.dump(result_json, f, ensure_ascii=False, indent=4)
+            print('Json file load!)
             
         return result_json
     except Exception as e:
