@@ -173,7 +173,7 @@ def main():
             
         with open('data.json', 'w', encoding='utf-8') as f:
             json.dump(result_json, f, ensure_ascii=False, indent=4)
-            print('Json file load!)
+            print('Json file load!')
             
         return result_json
     except Exception as e:
