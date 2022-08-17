@@ -13,7 +13,7 @@ cok = {
     "query": None,
     "pageview_id": "f3ae6db9c405036b",
     "aid": 304142,
-    "language": "ru",
+    "language": "en-gb",
     "size": 3
 }
 headers = {
@@ -49,14 +49,17 @@ async def get_page_data(session, page, dop_data):
                                 break
                         if dest_id == 0:
                             print(f'Hotel {page} not found!')
-                            return {}
+                            return {page: {}}
         url_search = f'https://www.booking.com/searchresults.en-gb.html?dest_id={dest_id}&dest_type=hotel&checkin={str(dop_data[0])}&checkout={str(dop_data[1])}&group_adults={dop_data[2]}&no_rooms=1&group_children={dop_data[3]}'
-        for age in dop_data[4]:
-            url_search += f'&age={str(age)}'
-        async with session.get(url_search, headers=headers, timeout=10) as response2:
-            print(f'{response2.status}: {page}')
-            if response2.status == 200:
-                return {page: await response2.text()}
+        try:
+            for age in dop_data[4]:
+                url_search += f'&age={str(age)}'
+            async with session.get(url_search, headers=headers, timeout=10) as response2:
+                print(f'{response2.status}: {page}')
+                if response2.status == 200:
+                    return {page: await response2.text()}
+        except Exception:
+            return {page: {}}
 
 
 async def gather_data(data, dop):
@@ -110,7 +113,7 @@ async def get_hotel_data(session, hotel, hotelUrl, cur):
                 return [hotel, url_hotel, await response.text(), cur]
     except asyncio.TimeoutError:
         print(f'TimeOut: {hotel}')
-        return []
+        return [hotel, url_hotel]
 
 
 async def parsw(mylist, cur):
@@ -132,6 +135,14 @@ def main_parser(datalist, storage, tt):
     for el in datalist:
         name_h = el[0]
         url_h = el[1]
+
+        if len(el) == 2:
+            params = {}
+            params['url'] = url_h
+            storage[name_h] = params
+            print(f'"{name_h}" is failed to connection!')
+            continue
+
         r = el[2]
         cur = el[3]
     
@@ -169,6 +180,7 @@ def main_parser(datalist, storage, tt):
     
             price = {}
             priceDefault = int(room.select_one('.prco-valign-middle-helper').text.replace('\n', ' ').split(cur)[-1][1:].replace(',', ''))
+            pd = priceDefault
             nalog = room.select_one('[class*="prd-taxes-and-fees-under-price"]').text.split(cur)
             if len(nalog) == 2:
                 nalog = int(nalog[1].split(' ')[0][1:].replace(',', ''))
@@ -206,20 +218,24 @@ def main_parser(datalist, storage, tt):
 
             #print(price)
 
-            types['Refund'] = room.select_one('li[class*="e2e-cancellation"]').select_one('.bui-list__description').text.replace('\n', ' ')
+            refnd = room.select_one('li[class*="e2e-cancellation"]').select_one('.bui-list__description').text.replace('\n', ' ')[1:-1]
 
             if room.select_one('[class*="bui-f-color-destructive"]'):
-                types['Discount'] = int(room.select_one('[class*="bui-f-color-destructive"]').text.replace('\n', ' ').split(cur)[-1][1:].replace(',', '')) - priceDefault
+                types['Discount'] = str(int(room.select_one('[class*="bui-f-color-destructive"]').text.replace('\n', ' ').split(cur)[-1][1:].replace(',', '')) - pd) + f' ({refnd})'
 
             for meal_el in types['Price']:
-                types['Price'][meal_el] += f' ({types["Refund"]})'
+                types['Price'][meal_el] += f' ({refnd})'
 
             for elem in params[currentRoom]['Types']:
                 if types['Sleeps'] == elem['Sleeps']:
-                    for k in elem['Price']:
-                        if k in types['Price']:
-                            elem['Price'][k] += f' \n{types["Price"][k]}'
-                            types["Price"].pop(k)
+                    if [k for k in elem['Price']] == [k for k in types['Price']]:
+                        for k in elem['Price']:
+                            if k in types['Price']:
+                                elem['Price'][k] += f', {types["Price"][k]}'
+                                types["Price"].pop(k)
+                        if 'Discount' in elem:
+                            elem['Discount'] += f', {types["Discount"]}'
+                            types.pop('Discount')
 
             if types["Price"] != {}:
                 params[currentRoom]['Types'].append(types)
@@ -283,7 +299,8 @@ def ParseBooking(data):
 
     print("Async booking parser start!")
     hotels_names = asyncio.run(gather_data(query, dop_data))
-    hotels_names = [i for i in hotels_names if i != {}]
+    unfound_hotels = [i for i in hotels_names if list(i.values())[0] == {}]
+    hotels_names = [i for i in hotels_names if list(i.values())[0] != {}]
 
     print("Parse Hotels...")
     #hotels_html = asyncio.run(parse_hotels(hotels_names, dop_data))
@@ -294,14 +311,19 @@ def ParseBooking(data):
 
     print("Getting hotels urls...")
     a = asyncio.run(parsw(final_hot_urls, data[-1]['CUR']))
-    a = [x for x in a if x != []]
 
     print("Parse data...")
-    get_soups = dict(my_async(a, main_parser, [nights, cnt_a, cnt_c]))
-    res_data = {key:value for key, value in get_soups.items() if len(value) > 0} # if value != {}
-    #with open('itog.json', 'w', encoding='utf-8') as f:
-    #    print('Wroten to file!')
-    #    json.dump(res_data, f, ensure_ascii=False, indent=4)
+    res_data = dict(my_async(a, main_parser, [nights, cnt_a, cnt_c]))
+
+    #res_data = {key:value for key, value in get_soups.items()} # if value != {}
+
+    for x in unfound_hotels:
+        res_data.update(x)
+
+    with open('itog.json', 'w', encoding='utf-8') as f:
+        print('Wroten to file!')
+        json.dump(res_data, f, ensure_ascii=False, indent=4)
+    
     return res_data
 
 #############################################################################
