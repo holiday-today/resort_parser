@@ -3,7 +3,6 @@ import requests
 import json
 import time
 import datetime
-from fake_useragent import UserAgent
 import asyncio
 import aiohttp
 from multiprocessing import Process, freeze_support, Manager
@@ -233,7 +232,7 @@ def main_parser(datalist, storage, tt):
                             if k in types['Price']:
                                 elem['Price'][k] += f', {types["Price"][k]}'
                                 types["Price"].pop(k)
-                        if 'Discount' in elem:
+                        if 'Discount' in elem and 'Discount' in types:
                             elem['Discount'] += f', {types["Discount"]}'
                             types.pop('Discount')
 
