@@ -49,7 +49,7 @@ def main():
         print('Get list...')   
         html_tags = soup.select_one('.resultset').select_one('table').select_one('tbody').select('[class*="price_info"]')
         pagelist = []
-        
+		
         for i in html_tags:
             if i.select_one('.btn-group'):
                 continue
@@ -75,6 +75,15 @@ def main():
             h['Date'] = i.select_one('.sortie').text.replace('\n', '')
             h['Nights'] = i.select_one('.c').text.replace('\n', '')
             h['Food'] = i.select('td:not([class])')[1].text.replace('\n', '')
+            
+            if 'Bed Breakfast' in h['Food']:
+                h['Food'] = 'Bed Breakfast'
+            elif 'Half Board' in h['Food']:
+                h['Food'] = 'Half Board'
+            elif 'Full Board' in h['Food']:
+                h['Food'] = 'Full Board'
+            elif 'All Inclusive' in h['Food']:
+                h['Food'] = 'All Inclusive'
             
             room_text = i.select('td:not([class])')[2].text.replace('\n', '').split(' / ')
             h['Room'] = room_text[0]
