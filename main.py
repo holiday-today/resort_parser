@@ -49,9 +49,9 @@ def main():
         print('Get list...')   
         html_tags = soup.select_one('.resultset').select_one('table').select_one('tbody').select('[class*="price_info"]')
         pagelist = []
-		
+        
         for i in html_tags:
-            if i.select_one('.btn-group'):
+            if i.select_one('.btn-group') or i.select_one('[class*="from_the_best"]'):
                 continue
 
             h = {}
@@ -72,10 +72,8 @@ def main():
                 h['Name'] = h['Name'][:-1]
             h['tmp'] = tmp_h
 
-            h['Date'] = i.select_one('.sortie').text.replace('\n', '')
-            h['Nights'] = i.select_one('.c').text.replace('\n', '')
             h['Food'] = i.select('td:not([class])')[1].text.replace('\n', '')
-            
+
             if 'Bed Breakfast' in h['Food']:
                 h['Food'] = 'Bed Breakfast'
             elif 'Half Board' in h['Food']:
@@ -87,7 +85,6 @@ def main():
             
             room_text = i.select('td:not([class])')[2].text.replace('\n', '').split(' / ')
             h['Room'] = room_text[0]
-            h['Sleeps'] = room_text[1].split('(')[0].split(' ')[0]
             
             tmp_p = i.select_one('.td_price').text
             while not tmp_p[0].isdigit():
@@ -112,12 +109,18 @@ def main():
         ppl.append({"ADULT": int(url_keys['ADULT']), "CHILD": int(url_keys['CHILD']), "AGES": url_keys['AGES'], 'CUR':cur, 'NIGHTS': url_keys['NIGHTS_FROM'], 'DATE': url_keys['CHECKIN_BEG']})
 
         bookHotels = ParseBooking(ppl)
+        #with open('itog.json', encoding='utf-8') as f:
+        #    bookHotels = json.load(f)
 
         resSleeps = str(int(url_keys['ADULT']) + int(url_keys['CHILD']))
-        
+
         itog_page = []
         
         bk = [k for k in bookHotels]
+
+        #if len(bk) != 0:
+        #    
+
         if len(bk) != 0:
             hotel_table = connect(pagelist, bk, 'Name')
             for c in hotel_table:
@@ -145,14 +148,18 @@ def main():
                             new_list[0][1] = []
                     if new_list[0][1] != []:
                         obj_booking = bookHotels[c[1][0]][new_list[0][1][0]]['Types']
-                        obj_book_price = [x['Price'] for x in obj_booking if x['Sleeps'] == resSleeps]
+                        obj_book_price = [[x['Price'], x["Discount"]] for x in obj_booking if x['Sleeps'] == resSleeps]
                         for obj_pr in obj_book_price:
-                            if obj_resort['Food'] in obj_pr:
-                                obj_resort['Price_booking'] = obj_pr[obj_resort['Food']]
+                            if obj_resort['Food'] in obj_pr[0]:
+                                obj_resort['Price_booking'] = obj_pr[0][obj_resort['Food']]
+                                if obj_pr[1] != None:
+                                    obj_resort["Booking_Discount"] = obj_pr[1]
                         if not 'Price_booking' in obj_resort:
                             for obj_pr in obj_book_price:
-                                if '|'+obj_resort['Food'] in obj_pr:
-                                    obj_resort['Price_booking'] = obj_pr['|'+obj_resort['Food']]
+                                if '|'+obj_resort['Food'] in obj_pr[0]:
+                                    obj_resort['Price_booking'] = obj_pr[0]['|'+obj_resort['Food']]
+                                    if obj_pr[1] != None:
+                                        obj_resort["Booking_Discount"] = obj_pr[1]
                             if not 'Price_booking' in obj_resort:
                                 obj_resort['Price_booking'] = None
                         obj_resort['booking_room_name'] = new_list[0][1][0]
@@ -166,8 +173,45 @@ def main():
         else:
             itog_page = pagelist
                 #print('################################')Price
+
+        ipk = 0
+        for k in itog_page:
+            ipk += 1
+
+            if k["Price_booking"] == None:
+                continue
+
+            new_k = k.copy()
+
+            ns = k["Price_booking"].split(', ')
+            np = ns[0].split(' (')
+
+            new_k["Price_booking"] = int(np[0])
+            new_k["Price_Type"] = np[1][:-1]
+
+            tmp_k = k.copy()
+            
+            if "Booking_Discount" in k:
+                print(k["Booking_Discount"])
+                nd = k["Booking_Discount"].split(', ')
+                ndp = nd[0].split(' (')[0]
+                ndt = nd[0].split(' (')[1][:-1]
+                if new_k["Price_Type"] == ndt:
+                    new_k["Booking_Discount"] = int(ndp)
+                    if len(nd) > 1:
+                        tmp_k["Booking_Discount"] = ', '.join(nd[1:])
+                    else:
+                        tmp_k.pop("Booking_Discount")
+            
+            itog_page[ipk-1] = new_k
+
+            if len(ns) > 1:
+                tmp_k["Price_booking"] = ', '.join(ns[1:])
+                itog_page[ipk:ipk] = [tmp_k]
+
         result_json[url_keys['PRICEPAGE']] = itog_page
-        
+        with open('data.json', 'w', encoding='utf-8') as f:
+            json.dump(result_json, f, ensure_ascii=False, indent=4)
         print('\n##################\nPage', (url_keys['PRICEPAGE']), 'is loaded!\n##################\n')
 
         if soup.select_one('.pager'):
