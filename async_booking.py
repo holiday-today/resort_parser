@@ -221,6 +221,8 @@ def main_parser(datalist, storage, tt):
 
             if room.select_one('[class*="bui-f-color-destructive"]'):
                 types['Discount'] = str(int(room.select_one('[class*="bui-f-color-destructive"]').text.replace('\n', ' ').split(cur)[-1][1:].replace(',', '')) - pd) + f' ({refnd})'
+            else:
+                types['Discount'] = None
 
             for meal_el in types['Price']:
                 types['Price'][meal_el] += f' ({refnd})'
@@ -232,7 +234,7 @@ def main_parser(datalist, storage, tt):
                             if k in types['Price']:
                                 elem['Price'][k] += f', {types["Price"][k]}'
                                 types["Price"].pop(k)
-                        if 'Discount' in elem and 'Discount' in types:
+                        if elem['Discount'] != None  and types['Discount'] != None :
                             elem['Discount'] += f', {types["Discount"]}'
                             types.pop('Discount')
 
