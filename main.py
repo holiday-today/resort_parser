@@ -192,7 +192,6 @@ def main():
             tmp_k = k.copy()
             
             if "Booking_Discount" in k:
-                print(k["Booking_Discount"])
                 nd = k["Booking_Discount"].split(', ')
                 ndp = nd[0].split(' (')[0]
                 ndt = nd[0].split(' (')[1][:-1]
