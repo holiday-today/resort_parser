@@ -265,20 +265,21 @@ def my_async(hh, func, tt=0):
     p = min(4, lh)   # Количество потоков
     b = []
 
-    for i in range(0, lh//2, lh//p):
-        b.append(Process(target=func, args=([hh[i:min(i+lh//p, lh//2)], soups, tt])))
-    for i in b:
-        i.start()
-    for i in b:
-        i.join()
-
-    b = []
-    for i in range(lh//2, lh, lh//p):
-        b.append(Process(target=func, args=([hh[i:min(i+lh//p, lh)], soups, tt])))
-    for i in b:
-        i.start()
-    for i in b:
-        i.join()
+    if p > 0:
+        for i in range(0, lh//2, lh//p):
+            b.append(Process(target=func, args=([hh[i:min(i+lh//p, lh//2)], soups, tt])))
+        for i in b:
+            i.start()
+        for i in b:
+            i.join()
+    
+        b = []
+        for i in range(lh//2, lh, lh//p):
+            b.append(Process(target=func, args=([hh[i:min(i+lh//p, lh)], soups, tt])))
+        for i in b:
+            i.start()
+        for i in b:
+            i.join()
 
     return soups
 
