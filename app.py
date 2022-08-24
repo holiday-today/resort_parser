@@ -39,15 +39,21 @@ def to_main_json(data):
                 post_json[el].append(i)
     return post_json
 
+file_ready = False
+
 @app.route("/", methods=["POST"])
 def get_full_response():
+    global file_ready
+    file_ready = False
     try:
         f = request.json
     except Exception as e1:
         return 'Bad response json :('
     print('we have json!')
     print(f)
-    return main.start(to_main_json(f))
+    result = main.start(to_main_json(f))
+    file_ready = True
+    return result
 
 @app.route("/state", methods=["GET"])
 def get_states():
@@ -57,8 +63,11 @@ def get_states():
 def get_cities(state_id):
     return parse_resort_states.start(state_id)
 
-@app.route("/test", methods=["GET"])
+@app.route("/getfiles", methods=["GET"])
 def test():
-    with open('data.json', encoding='utf-8') as f:
-        bookHotels = json.load(f)
-    return bookHotels
+    if file_ready:
+        with open('data.json', encoding='utf-8') as f:
+            bookHotels = json.load(f)
+        return bookHotels
+    else:
+        return 'File not ready yet! Please wait a 30 seconds more...', 423
