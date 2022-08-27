@@ -42,7 +42,8 @@ def to_main_json(data):
 
 @app.route("/", methods=["POST"])
 def get_full_response():
-    os.remove("data.json")
+    if os.path.isfile("data.json"):
+        os.remove("data.json")
     try:
         f = request.json
     except Exception as e1:
