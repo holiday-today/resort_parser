@@ -4,6 +4,7 @@ import logging
 from flask_cors import CORS
 import parse_resort_states
 import async_booking
+import os
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -39,12 +40,9 @@ def to_main_json(data):
                 post_json[el].append(i)
     return post_json
 
-file_ready = False
-
 @app.route("/", methods=["POST"])
 def get_full_response():
-    global file_ready
-    file_ready = False
+    os.remove("data.json")
     try:
         f = request.json
     except Exception as e1:
@@ -52,7 +50,6 @@ def get_full_response():
     print('we have json!')
     print(f)
     result = main.start(to_main_json(f))
-    file_ready = True
     return result
 
 @app.route("/state", methods=["GET"])
@@ -65,7 +62,7 @@ def get_cities(state_id):
 
 @app.route("/getfiles", methods=["GET"])
 def test():
-    if file_ready:
+    if os.path.isfile("data.json"):
         with open('data.json', encoding='utf-8') as f:
             bookHotels = json.load(f)
         return bookHotels
