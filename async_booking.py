@@ -258,31 +258,30 @@ def my_function(a_el, soups, tt):
 
 
 def my_async(hh, func, tt=0):
-    lh = len(hh)
-    my_collection = {}
-
-    p = 8
-    
-    if lh == 0:
-        return {}
-
     manager = Manager()
+    soups = manager.dict()
 
-    for times in range(0, lh, p):
-        soups = manager.dict()
+    lh = len(hh)
+    p = min(4, lh)   # Количество потоков
+    b = []
+
+    if p > 0:
+        for i in range(0, lh//2, lh//p):
+            b.append(Process(target=func, args=([hh[i:min(i+lh//p, lh//2)], soups, tt])))
+        for i in b:
+            i.start()
+        for i in b:
+            i.join()
+    
         b = []
-
-        for i in range(times, min(lh, p)):
-            b.append(Process(target=func, args=([hh[i:i+1], soups, tt])))
+        for i in range(lh//2, lh, lh//p):
+            b.append(Process(target=func, args=([hh[i:min(i+lh//p, lh)], soups, tt])))
         for i in b:
             i.start()
         for i in b:
             i.join()
 
-        lh -= p
-        my_collection.update(soups)
-
-    return my_collection
+    return soups
 
 #############################################################################
 
