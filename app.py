@@ -51,7 +51,7 @@ def get_full_response():
     print('we have json!')
     print(f)
     result = main.start(to_main_json(f))
-    return result
+    return "ok"
 
 @app.route("/state", methods=["GET"])
 def get_states():
