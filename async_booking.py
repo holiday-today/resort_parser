@@ -162,13 +162,7 @@ def main_parser(datalist, storage, tt):
                 while not currentRoom[-1].isalpha():
                     currentRoom = currentRoom[:-1]
     
-                RoomBed = ''
-                if 'double' in room.select_one('[class*="bed-types-wrapper"]').text:
-                    RoomBed = 'double'
-                else:
-                    RoomBed = 'single'
-    
-                params[currentRoom] = {'RoomBed': RoomBed, 'Types': []}
+                params[currentRoom] = {'Types': []}
     
             sleeps = room.select('.bui-u-sr-only')[0].text.replace('\n', ' ').split(' ')
             sleeps = [x for x in sleeps if x.isdigit()]
