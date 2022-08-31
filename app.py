@@ -50,7 +50,9 @@ def get_full_response():
         return 'Bad response json :('
     print('we have json!')
     print(f)
-    result = main.start(to_main_json(f))
+    file_id = f['id']
+    f.pop('id')
+    result = main.start(to_main_json(f), file_id)
     return result
 
 @app.route("/state", methods=["GET"])
