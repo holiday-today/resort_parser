@@ -61,11 +61,12 @@ def get_states():
 def get_cities(state_id):
     return parse_resort_states.start(state_id)
 
-@app.route("/getfiles", methods=["GET"])
-def test():
-    if os.path.isfile("data.json"):
-        with open('data.json', encoding='utf-8') as f:
-            bookHotels = json.load(f)
-        return bookHotels
+@app.route("/getfiles/<string:file_id>", methods=["GET"])
+def get_file(file_id):
+    lll = {}
+    if os.path.isfile(f'{file_id}.json'):
+        with open(f'{file_id}.json', encoding='utf-8') as f:
+            lll = json.load(f)
+        return lll
     else:
         return 'File not ready yet! Please wait a 30 seconds more...', 423
