@@ -310,9 +310,7 @@ def ParseBooking(data):
     a = asyncio.run(parsw(final_hot_urls, data[-1]['CUR']))
 
     print("Parse data...")
-    time0 = time.time()
     res_data = dict(my_async(a, main_parser, [nights, cnt_a, cnt_c]))
-    print(time.time() - time0)
     #res_data = {key:value for key, value in get_soups.items()} # if value != {}
 
     for x in unfound_hotels:
