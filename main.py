@@ -15,15 +15,9 @@ headers = {
         'user-agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.148 YaBrowser/22.7.2.902 Yowser/2.5 Safari/537.36'
 }
 
-# пример
-url_keys = {
-}
-
-result_json = {}
-
-def main():
-    global url_keys
+def main(url_keys):
     url = main_url_rh
+    result_json = {}
     for key, value in url_keys.items():
         if isinstance(value, list):
             if len(value) > 0:
@@ -209,8 +203,7 @@ def main():
                 itog_page[ipk:ipk] = [tmp_k]
 
         result_json[url_keys['PRICEPAGE']] = itog_page
-        with open('data.json', 'w', encoding='utf-8') as f:
-            json.dump(result_json, f, ensure_ascii=False, indent=4)
+        
         print('\n##################\nPage', (url_keys['PRICEPAGE']), 'is loaded!\n##################\n')
 
         if soup.select_one('.pager'):
@@ -223,18 +216,14 @@ def main():
             print('Last page loaded!')
             result_json[url_keys['PRICEPAGE']].append({'LastPage': True})
             
-        with open('data.json', 'w', encoding='utf-8') as f:
-            json.dump(result_json, f, ensure_ascii=False, indent=4)
-            print('Json file load!')
-            
         return result_json
+    
     except Exception as e:
         print('Something wrong! Try again...')
         print(traceback.print_exc())
 
 
-def start(server_data):
-    global url_keys
+def start(server_data, file_id):
     print('main parser start')
     strs_tmp = []
     if '4' in server_data['STARS']:
@@ -257,10 +246,14 @@ def start(server_data):
         'HOTELS': server_data['HOTELS'],
         'MEALS': server_data['MEALS'],
         'STARS': strs_tmp,
-        'FILTER': '1',              
-        'PRICEPAGE': 1,             
-        'DOLOAD': 1                 
+        'FILTER': '1',
+        'DOLOAD': 1,   
+        'PRICEPAGE': 1
     }
     print('Get json:')
     print(url_keys)
-    return main()
+    itog_file = main(url_keys)
+    with open(f'{file_id}.json', 'w', encoding='utf-8') as f:
+        json.dump(itog_file, f, ensure_ascii=False, indent=4)
+        print('Json file load!')
+    return itog_file
