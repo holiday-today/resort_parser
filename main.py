@@ -223,7 +223,7 @@ def main(url_keys):
         print(traceback.print_exc())
 
 
-def start(server_data):
+def start(server_data, file_id):
     print('main parser start')
     strs_tmp = []
     if '4' in server_data['STARS']:
@@ -253,7 +253,7 @@ def start(server_data):
     print('Get json:')
     print(url_keys)
     itog_file = main(url_keys)
-    with open('data.json', 'w', encoding='utf-8') as f:
+    with open(f'{file_id}.json', 'w', encoding='utf-8') as f:
         json.dump(itog_file, f, ensure_ascii=False, indent=4)
         print('Json file load!')
     return itog_file
