@@ -42,15 +42,15 @@ def to_main_json(data):
 
 @app.route("/", methods=["POST"])
 def get_full_response():
-    if os.path.isfile("data.json"):
-        os.remove("data.json")
     try:
         f = request.json
     except Exception as e1:
         return 'Bad response json :('
     print('we have json!')
     print(f)
-    result = main.start(to_main_json(f))
+    file_id = f['id']
+    f.pop('id')
+    result = main.start(to_main_json(f), file_id)
     return result
 
 @app.route("/state", methods=["GET"])
@@ -61,11 +61,11 @@ def get_states():
 def get_cities(state_id):
     return parse_resort_states.start(state_id)
 
-@app.route("/getfiles", methods=["GET"])
-def get_file():
+@app.route("/getfiles/<string:file_id>", methods=["GET"])
+def get_file(file_id):
     lll = {}
-    if os.path.isfile('data.json'):
-        with open('data.json', encoding='utf-8') as f:
+    if os.path.isfile(f'{file_id}.json'):
+        with open(f'{file_id}.json', encoding='utf-8') as f:
             lll = json.load(f)
         return lll
     else:
