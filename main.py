@@ -265,3 +265,4 @@ def start(server_data, file_id):
     with open(f'{file_id}.json', 'w', encoding='utf-8') as f:
         json.dump(itog_file, f, ensure_ascii=False, indent=4)
         print('Json file load!')
+    return itog_file
