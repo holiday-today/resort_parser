@@ -50,8 +50,8 @@ def get_full_response():
     print(f)
     file_id = f['id']
     f.pop('id')
-    result = main.start(to_main_json(f), file_id)
-    return result
+    main.start(to_main_json(f), file_id)
+    return "File ready!", 200
 
 @app.route("/state", methods=["GET"])
 def get_states():
