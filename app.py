@@ -50,8 +50,11 @@ def get_full_response():
     print(f)
     file_id = f['id']
     f.pop('id')
-    main.start(to_main_json(f), file_id)
-    return "File ready!", 200
+    endres = main.start(to_main_json(f), file_id)
+    if 'error' in endres:
+        return "Нет данных", 405
+    else:
+        return "File ready!", 200
 
 @app.route("/state", methods=["GET"])
 def get_states():
