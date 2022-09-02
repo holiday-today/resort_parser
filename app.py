@@ -54,7 +54,8 @@ def get_full_response():
     if 'error' in endres:
         return "Нет данных", 405
     else:
-        return "File ready!", 200
+        #return "File ready!", 200
+        return endres
 
 @app.route("/state", methods=["GET"])
 def get_states():
