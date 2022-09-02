@@ -6,6 +6,7 @@ import time
 from async_booking import ParseBooking
 from connector import connect
 import traceback
+import os
 
 main_url_rh = 'https://search.resort-holiday.com/search_hotel?'
 
@@ -248,12 +249,19 @@ def start(server_data, file_id):
         'STARS': strs_tmp,
         'FILTER': '1',
         'DOLOAD': 1,   
-        'PRICEPAGE': 1
+        'PRICEPAGE': server_data['PRICEPAGE']
     }
     print('Get json:')
     print(url_keys)
     itog_file = main(url_keys)
+
+    if os.path.isfile(f'{file_id}.json'):
+        lll = {}
+        with open(f'{file_id}.json', encoding='utf-8') as f:
+            lll = json.load(f)
+        lll['1'].extend(itog_file['PRICEPAGE'])
+        itog_file = lll
+
     with open(f'{file_id}.json', 'w', encoding='utf-8') as f:
         json.dump(itog_file, f, ensure_ascii=False, indent=4)
         print('Json file load!')
-    return itog_file
