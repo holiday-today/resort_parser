@@ -255,7 +255,7 @@ def my_async(hh, func, tt=0):
     lh = len(hh)
     my_collection = {}
 
-    p = 8
+    p = 6
     
     if lh == 0:
         return {}
