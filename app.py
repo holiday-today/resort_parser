@@ -52,7 +52,7 @@ def get_full_response():
     f.pop('id')
     endres = main.start(to_main_json(f), file_id)
     if 'error' in endres:
-        return "Нет данных", 500
+        return "Нет данных", 406
     else:
         return "File ready!", 200
         #return endres
