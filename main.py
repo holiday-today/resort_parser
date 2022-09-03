@@ -259,7 +259,8 @@ def start(server_data, file_id):
         lll = {}
         with open(f'{file_id}.json', encoding='utf-8') as f:
             lll = json.load(f)
-        lll['1'].extend(itog_file[server_data['PRICEPAGE']])
+        for i in lll:
+            lll[i].extend(itog_file[server_data['PRICEPAGE']])
         itog_file = lll
 
     with open(f'{file_id}.json', 'w', encoding='utf-8') as f:
