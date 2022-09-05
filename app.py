@@ -40,6 +40,11 @@ def to_main_json(data):
                 post_json[el].append(i)
     return post_json
 
+@app.before_first_request
+def flcl():
+    for filename in glob.glob("*.json"):
+        os.remove(filename)
+
 @app.route("/", methods=["POST"])
 def get_full_response():
     try:
@@ -74,3 +79,7 @@ def get_file(file_id):
         return lll
     else:
         return 'File not ready yet! Please wait a 30 seconds more...', 423
+
+@app.route("/getfiles/count", methods=["GET"])
+def cnt_files():
+    return str(len(glob.glob("*.json")))
