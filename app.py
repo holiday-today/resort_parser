@@ -4,7 +4,7 @@ import logging
 from flask_cors import CORS
 import parse_resort_states
 import async_booking
-import os
+import os, glob
 
 logging.basicConfig(level=logging.DEBUG)
 
