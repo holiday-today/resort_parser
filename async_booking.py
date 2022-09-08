@@ -256,7 +256,7 @@ def my_async(hh, func, tt=0):
     my_collection = {}
 
     p = 6
-    
+
     if lh == 0:
         return {}
 
@@ -266,15 +266,16 @@ def my_async(hh, func, tt=0):
         soups = manager.dict()
         b = []
 
-        for i in range(times, min(lh, p)):
+        for i in range(times, times+min(lh, p)):
             b.append(Process(target=func, args=([hh[i:i+1], soups, tt])))
         for i in b:
             i.start()
         for i in b:
             i.join()
 
-        lh -= p
         my_collection.update(soups)
+
+        lh -= p
 
     return my_collection
 
