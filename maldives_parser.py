@@ -127,24 +127,3 @@ def start(server_data, id_claim, file_id):
         return "Несуществующий id_claim", 404
 
     return main(server_data, mft)
-
-
-if __name__ == '__main__':
-    w = {
-        "STATEINC": "50",
-        "CHECKIN_BEG": "20221020",
-        "NIGHTS_FROM": "7",
-        "ADULT": "2",
-        "CHILD": "0",
-        "AGES": [
-            "0"
-        ],
-        "TOWNS": [],
-        "CURRENCY": "1",
-        "STARS": [],
-        "PRICEPAGE": 1,
-        "HOTELS": [],
-        "MEALS": [],
-        "DOLOAD": 1
-    }
-    print(start(w, "0x430A0000000202000000010000003200000003000000006CE70ADFAF34000000006AB707000003D8000000F0000000040000000400000000000000000000000100000000AF3B000007000000000075F3500000000202020000636363AF340000AF3B0000020000000003000000000000000000000000000000000000000000000000", "file1664820590.991211"))
