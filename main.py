@@ -85,7 +85,10 @@ def main(url_keys):
             while not tmp_p[0].isdigit():
                 tmp_p = tmp_p[1:]
             h['Price_resort'] = int(tmp_p.split(' ')[0])
-            
+
+            h['Price_check_resort'] = f'https://search.resort-holiday.com/bron_person?CATCLAIM={i.get("data-cat-claim")}'
+            h['id_claim'] = i.get('data-cat-claim')
+
             pagelist.append(h)
     except:
         print('Broken values! Try load page again...')
@@ -143,18 +146,14 @@ def main(url_keys):
                             new_list[0][1] = []
                     if new_list[0][1] != []:
                         obj_booking = bookHotels[c[1][0]][new_list[0][1][0]]['Types']
-                        obj_book_price = [[x['Price'], x["Discount"]] for x in obj_booking if x['Sleeps'] == resSleeps]
+                        obj_book_price = [[x['Price']] for x in obj_booking if x['Sleeps'] == resSleeps]
                         for obj_pr in obj_book_price:
                             if obj_resort['Food'] in obj_pr[0]:
                                 obj_resort['Price_booking'] = obj_pr[0][obj_resort['Food']]
-                                if obj_pr[1] != None:
-                                    obj_resort["Booking_Discount"] = obj_pr[1]
                         if not 'Price_booking' in obj_resort:
                             for obj_pr in obj_book_price:
                                 if '|'+obj_resort['Food'] in obj_pr[0]:
                                     obj_resort['Price_booking'] = obj_pr[0]['|'+obj_resort['Food']]
-                                    if obj_pr[1] != None:
-                                        obj_resort["Booking_Discount"] = obj_pr[1]
                             if not 'Price_booking' in obj_resort:
                                 obj_resort['Price_booking'] = None
                         obj_resort['booking_room_name'] = new_list[0][1][0]
@@ -185,17 +184,6 @@ def main(url_keys):
             new_k["Price_Type"] = np[1][:-1]
 
             tmp_k = k.copy()
-            
-            if "Booking_Discount" in k:
-                nd = k["Booking_Discount"].split(', ')
-                ndp = nd[0].split(' (')[0]
-                ndt = nd[0].split(' (')[1][:-1]
-                if new_k["Price_Type"] == ndt:
-                    new_k["Booking_Discount"] = int(ndp)
-                    if len(nd) > 1:
-                        tmp_k["Booking_Discount"] = ', '.join(nd[1:])
-                    else:
-                        tmp_k.pop("Booking_Discount")
             
             itog_page[ipk-1] = new_k
 
@@ -247,6 +235,8 @@ def start(server_data, file_id):
         'HOTELS': server_data['HOTELS'],
         'MEALS': server_data['MEALS'],
         'STARS': strs_tmp,
+        'COSTMIN': server_data['COSTMIN'],
+        'COSTMAX': server_data['COSTMAX'],
         'FILTER': '1',
         'DOLOAD': 1,   
         'PRICEPAGE': server_data['PRICEPAGE']
