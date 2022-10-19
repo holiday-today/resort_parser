@@ -86,7 +86,7 @@ def main(url_keys):
                 tmp_p = tmp_p[1:]
             h['Price_resort'] = int(tmp_p.split(' ')[0])
 
-            h['Price_check_resort'] = f'https://search.resort-holiday.com/bron_person?CATCLAIM={i.get("data-cat-claim")}'
+            h['Price_check_resort'] = f'https://search.resort-holiday.com/bron_person?CATCLAIM={i.get("data-cat-claim")}&TOWNFROMINC=1&STATEINC={url_keys["STATEINC"]}&PACKET=2&GUEST=1'
             h['id_claim'] = i.get('data-cat-claim')
 
             pagelist.append(h)
