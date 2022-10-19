@@ -95,7 +95,7 @@ def cnt_files():
     return str(len(glob.glob("*.json")))
 
 
-@app.route("/maldives/<string:id_claim>", methods=["GET"])
+@app.route("/maldives/<string:id_claim>", methods=["POST"])
 def get_mald(id_claim):
     try:
         f = request.json
