@@ -89,7 +89,7 @@ def main(url_keys, claim):
                 tmp_p = tmp_p[1:]
             h['Price'] = int(tmp_p.split(' ')[0])
 
-            h['Price_check_url'] = f'https://online.maldives.ru/bron_person?CATCLAIM={i.get("data-cat-claim")}'
+            h['Price_check_url'] = f'https://online.maldives.ru/bron_person?CATCLAIM={i.get("data-cat-claim")}&TOWNFROMINC=1&STATEINC={url_keys["STATEINC"]}&PACKET=2&GUEST=1'
 
             pagelist.append(h)
     except:
