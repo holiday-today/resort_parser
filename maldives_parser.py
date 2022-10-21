@@ -60,7 +60,21 @@ def main(url_keys, claim):
         else:
             return f"Не удалось найти отель {claim['Name']}", 403
 
-        url += f'HOTELS={hotel_id}&MEALS={foodMald}'
+        r = requests.get(claim['Price_check_resort'], headers=headers, verify=False)
+        soup = BeautifulSoup(r.text, features="html.parser")
+        try:
+            transfer = soup.select_one('[class*="ASERVICES_1"]').select_one('tbody').select_one('tr').get('class')[0][-2:]
+        except e:
+            transfer = ''
+        else:
+            if transfer == '_6':
+                transfer = '143'
+            elif transfer == '_7':
+                transfer = '144'
+            else:
+                transfer = '142'
+
+        url += f'HOTELS={hotel_id}&MEALS={foodMald}&TOURINC={transfer}'
         print(url)
         r = requests.get(url, headers=headers, verify=False)
         soup = BeautifulSoup(r.text, features="html.parser")
@@ -98,15 +112,20 @@ def main(url_keys, claim):
         return {'error': 'Broken values! Try load page again...'}
 
     room_name = connect([claim], rm_lst, 'Room')
+    pcm = ''
     if len(set(room_name[0][1])) == 1:
         itog_room = []
         my_el = room_name[0][1][0]
         for cc in range(len(rm_lst)):
             if rm_lst[cc] == my_el:
                 itog_room.append({'Transfer': pagelist[cc]['Tour'], 'Price_Maldives': pagelist[cc]['Price'], 'Price_check_maldives': pagelist[cc]['Price_check_url']})
+                pcm = pagelist[cc]['Price_check_url']
     else:
         return f"Не удалось найти комнату {claim['Room']}", 402
-    return {'data': itog_room}, 200
+    if len(itog_room) == 1:
+        return {'data': itog_room}, 200
+    if len(itog_room) > 1:
+        return {'data': [{'Transfer': 'Трансфер не определен!', 'Price_Maldives': 0, 'Price_check_maldives': pcm}]}, 200
 
 
 def start(server_data, id_claim, file_id):
